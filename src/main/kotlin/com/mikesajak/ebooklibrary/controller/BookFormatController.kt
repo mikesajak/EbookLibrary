@@ -1,6 +1,6 @@
 package com.mikesajak.ebooklibrary.controller
 
-import com.mikesajak.ebooklibrary.bookformat.BookFormatReaderRegistry
+import com.mikesajak.ebooklibrary.bookformat.BookFormatManager
 import com.mikesajak.ebooklibrary.exceptions.BookFormatNotFoundException
 import com.mikesajak.ebooklibrary.exceptions.BookFormatTypeException
 import com.mikesajak.ebooklibrary.exceptions.BookNotFoundException
@@ -28,14 +28,14 @@ class BookFormatController {
     lateinit var bookFormatStorageService: BookFormatStorageService
 
     @Autowired
-    lateinit var bookFormatReaderRegistry: BookFormatReaderRegistry
+    lateinit var bookFormatManager: BookFormatManager
 
     @PostMapping("/bookFormats/{bookId}")
     fun uploadBookFormat(@PathVariable("bookId") bookId: BookId,
                          @RequestParam("file") file: MultipartFile): String {
 
         val contentType = file.contentType ?: throw BookFormatTypeException("No content type for book format provided. ${file.name}")
-        val bookReader = bookFormatReaderRegistry.readerFor(contentType) ?: throw BookFormatTypeException("Unsupported content type for ")
+        val bookReader = bookFormatManager.readerFor(contentType) ?: throw BookFormatTypeException("Unsupported content type for ")
         val bookMetadata = bookMetadataStorageService.getBook(bookId) ?: throw BookNotFoundException(bookId)
 
         // TODO: book format validation

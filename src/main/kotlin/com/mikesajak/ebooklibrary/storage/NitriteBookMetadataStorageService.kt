@@ -1,7 +1,7 @@
 package com.mikesajak.ebooklibrary.storage
 
 import com.mikesajak.ebooklibrary.payload.Book
-import com.mikesajak.ebooklibrary.payload.BookMetadata
+import com.mikesajak.ebooklibrary.payload.BookDescriptor
 import com.mikesajak.ebooklibrary.payload.BookId
 import org.dizitart.no2.IndexOptions
 import org.dizitart.no2.IndexType
@@ -21,9 +21,9 @@ class NitriteBookMetadataStorageService(nitriteDbService: NitriteDbService) : Bo
         }
     }
 
-    override fun addBook(bookMetadata: BookMetadata): BookId {
+    override fun addBook(bookDescriptor: BookDescriptor): BookId {
         val id = BookId.randomBookId()
-        val book = Book(id, bookMetadata)
+        val book = Book(id, bookDescriptor)
 
         bookRepo.insert(book)
 
