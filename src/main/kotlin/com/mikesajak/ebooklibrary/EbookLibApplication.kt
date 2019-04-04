@@ -1,6 +1,6 @@
 package com.mikesajak.ebooklibrary
 
-import com.mikesajak.ebooklibrary.payload.BookDescriptor
+import com.mikesajak.ebooklibrary.payload.BookMetadata
 import com.mikesajak.ebooklibrary.storage.NitriteStorageProperties
 import com.mikesajak.ebooklibrary.storage.BookMetadataStorageService
 import com.mikesajak.ebooklibrary.storage.FileStorageProperties
@@ -19,15 +19,15 @@ class EbookLibApplication {
 
         if (bookMetadataStorageService.listBooks().isEmpty()) {
             val demoBooks = listOf(
-                BookDescriptor(
+                BookMetadata(
                     "Książka 1", "Grzegorz Brzęczyszczykiewicz", listOf("tag1", "tag2"),
                     listOf(), null, null, null, listOf("polski"), null
                 ),
-                BookDescriptor(
+                BookMetadata(
                     "Książka 2", "Grzegorz Brzęczyszczykiewicz", listOf(),
                     listOf(), null, null, null, listOf("polski"), null
                 ),
-                BookDescriptor(
+                BookMetadata(
                     "Książka 3", "Dan Brown", listOf("tag1", "tag2", "tag3"),
                     listOf(), null, null, null, listOf("angielski"), null
                 )

@@ -11,14 +11,14 @@ data class BookId(val value: String) {
     override fun toString(): String = value
 }
 
-data class Book(val id: BookId, val descriptor: BookDescriptor)
+data class Book(val id: BookId, val metadata: BookMetadata)
 
-data class BookDescriptor(val title: String,
-                          val author: String?,
-                          val tags: List<String>,
-                          val identifiers: List<String>,
-                          val creationDate: LocalDate?,
-                          val publicationDate: LocalDate?,
-                          val publisher: String?,
-                          val languages: List<String>,
-                          val description: String?)
+data class BookMetadata(val title: String,
+                        val authors: List<String>,
+                        val tags: List<String>,
+                        val identifiers: List<String>,
+                        val creationDate: LocalDate?,
+                        val publicationDate: LocalDate?,
+                        val publisher: String?,
+                        val languages: List<String>,
+                        val description: String?)
