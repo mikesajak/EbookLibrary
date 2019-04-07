@@ -1,0 +1,71 @@
+buildscript {
+    ext {
+        kotlinVersion = '1.3.21'
+        springBootVersion = '2.1.3.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
+        classpath("org.jetbrains.kotlin:kotlin-allopen:${kotlinVersion}")
+    }
+}
+
+plugins {
+    id 'java'
+    id 'org.jetbrains.kotlin.jvm' version '1.3.21'//kotlinVersion
+}
+
+apply plugin: 'kotlin'
+apply plugin: 'kotlin-spring'
+apply plugin: 'java'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+group 'com.mikesajak.ebooklibrary'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    maven {
+        url 'https://github.com/psiegman/mvn-repo/raw/master/releases'
+    }
+}
+
+ext {
+    nitriteVersion = '3.2.0'
+    jacksonVersion = '2.9.5'
+}
+
+dependencies {
+    implementation project(':ebook-library-common')
+
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation 'org.jetbrains.kotlin:kotlin-reflect'
+    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion"
+    implementation "org.dizitart:nitrite:${nitriteVersion}"
+    implementation "org.dizitart:potassium-nitrite:${nitriteVersion}"
+    implementation ('nl.siegmann.epublib:epublib-core:3.1') {
+        exclude group: 'org.slf4j'
+        exclude group: 'xmlpull'
+    }
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+compileKotlin {
+    kotlinOptions {
+        freeCompilerArgs = ["-Xjsr305=strict"]
+        jvmTarget = "1.8"
+    }
+}
+compileTestKotlin {
+    kotlinOptions {
+        freeCompilerArgs = ["-Xjsr305=strict"]
+        jvmTarget = "1.8"
+    }
+}
