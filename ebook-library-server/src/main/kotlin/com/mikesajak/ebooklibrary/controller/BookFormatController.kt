@@ -1,6 +1,6 @@
 package com.mikesajak.ebooklibrary.controller
 
-import com.mikesajak.ebooklibrary.bookformat.BookFormatManager
+import com.mikesajak.ebooklibrary.bookformat.BookFormatReaderRegistry
 import com.mikesajak.ebooklibrary.exceptions.BookFormatNotFoundException
 import com.mikesajak.ebooklibrary.exceptions.BookFormatTypeException
 import com.mikesajak.ebooklibrary.exceptions.BookNotFoundException
@@ -31,7 +31,7 @@ class BookFormatController {
     lateinit var bookFormatStorageService: BookFormatStorageService
 
     @Autowired
-    lateinit var bookFormatManager: BookFormatManager
+    lateinit var bookFormatManager: BookFormatReaderRegistry
 
     @PostMapping("/bookFormats/{bookId}")
     fun uploadBookFormat(@PathVariable("bookId") bookId: BookId,
