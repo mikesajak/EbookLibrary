@@ -12,32 +12,32 @@ class EpubBookMetadataReader : BookMetadataReader("EPUB") {
         val reader = EpubReader()
         val epub = reader.readEpub(ByteArrayInputStream(bookData.data))
 
-        val metadata = epub.metadata
-        val title = metadata.firstTitle
+        val bookMetaBuilder = BookMetadata.builder(epub.metadata.firstTitle)
+        epub.metadata.authors.map { "${it.firstname} ${it.lastname}" }
+            .forEach { bookMetaBuilder.author(it) }
 
-        val authors = metadata.authors
-            .map { "${it.firstname} ${it.lastname}" }
-            .toList()
+        epub.metadata.identifiers.map { "${it.scheme}:${it.value}" }
+            .forEach { bookMetaBuilder.identifier(it) }
 
-        val identifiers = metadata.identifiers
-            .map { "${it.scheme}:${it.value}" }
-            .toList()
-
-        val creationDate = metadata.dates.filter { it.event == Date.Event.CREATION }
+        epub.metadata.dates.filter { it.event == Date.Event.CREATION }
             .map { LocalDate.parse(it.value) }
-            .firstOrNull()
+            .take(1)
+            .forEach { bookMetaBuilder.creationDate(it) }
 
-        val publicationDate = metadata.dates.filter { it.event == Date.Event.PUBLICATION }
+        epub.metadata.dates.filter { it.event == Date.Event.PUBLICATION }
             .map { LocalDate.parse(it.value) }
-            .firstOrNull()
+            .take(1)
+            .forEach { bookMetaBuilder.publicationDate(it) }
 
-        val publisher = metadata.publishers.firstOrNull()
+        epub.metadata.publishers.take(1)
+            .forEach { bookMetaBuilder.publisher(it) }
 
-        val description = metadata.descriptions
+        val descr = epub.metadata.descriptions
             .fold("", operation = { acc, d -> "$acc\n\n$d" })
 
-        return BookMetadata(title, authors, listOf(), identifiers,
-            creationDate, publicationDate, publisher, listOf(metadata.language),
-            description)
+        if (descr.isNotBlank())
+            bookMetaBuilder.description(descr)
+
+        return bookMetaBuilder.build()
     }
 }

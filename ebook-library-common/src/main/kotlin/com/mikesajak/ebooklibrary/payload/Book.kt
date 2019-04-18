@@ -52,6 +52,9 @@ data class BookMetadata(val title: String,
         publisher, languages, null, description)
 
     companion object {
+
+        fun builder(title: String) = Builder(title)
+
         data class Builder(val title: String) {
             private val authors: MutableList<String> = mutableListOf()
             private val tags: MutableList<String> = mutableListOf()
@@ -66,55 +69,55 @@ data class BookMetadata(val title: String,
             fun build() = BookMetadata(title, authors, tags, identifiers, creationDate,
                 publicationDate, publisher, languages, series, description)
 
-            fun author(name: String) = let {
+            fun author(name: String) = apply {
                 authors += name
             }
 
-            fun authors(names: List<String>) = let {
+            fun authors(names: List<String>) = apply {
                 authors += names
             }
 
-            fun tag(t: String) = let {
+            fun tag(t: String) = apply {
                 tags += t
             }
 
-            fun tags(ts: List<String>) = let {
+            fun tags(ts: List<String>) = apply {
                 tags += ts
             }
 
-            fun identifier(id: String) = let {
+            fun identifier(id: String) = apply {
                 identifiers += id
             }
 
-            fun identifiers(ids: List<String>) = let {
+            fun identifiers(ids: List<String>) = apply {
                 identifiers += ids
             }
 
-            fun creationDate(date: LocalDate) = let {
+            fun creationDate(date: LocalDate) = apply {
                 creationDate = date
             }
 
-            fun publicationDate(date: LocalDate) = let {
+            fun publicationDate(date: LocalDate) = apply {
                 publicationDate = date
             }
 
-            fun publisher(name: String) = let {
+            fun publisher(name: String) = apply {
                 publisher = name
             }
 
-            fun language(lang: String) = let {
+            fun language(lang: String) = apply {
                 languages += lang
             }
 
-            fun languages(langs: List<String>) = let {
+            fun languages(langs: List<String>) = apply {
                 languages += langs
             }
 
-            fun series(ser: Series) = let {
+            fun series(ser: Series) = apply {
                 series = ser
             }
 
-            fun description(descr: String) = let {
+            fun description(descr: String) = apply {
                 description = descr
             }
 
