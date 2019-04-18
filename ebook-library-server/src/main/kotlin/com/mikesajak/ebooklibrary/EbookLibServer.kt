@@ -13,11 +13,11 @@ import org.springframework.context.annotation.Bean
 @SpringBootApplication
 @EnableConfigurationProperties(FileStorageProperties::class,
                                NitriteStorageProperties::class)
-class EbookLibApplication {
+class EbookLibServer {
     @Bean
     fun demoData(bookMetadataStorageService: BookMetadataStorageService) = CommandLineRunner {
 
-        if (bookMetadataStorageService.listBooks().isEmpty()) {
+        if (false && bookMetadataStorageService.listBooks().isEmpty()) {
             val demoBooks = listOf(
                 BookMetadata(
                     "Książka 1", "Grzegorz Brzęczyszczykiewicz", listOf("tag1", "tag2"),
@@ -44,5 +44,5 @@ class EbookLibApplication {
 }
 
 fun main(args: Array<String>) {
-    SpringApplication.run(EbookLibApplication::class.java, *args)
+    SpringApplication.run(EbookLibServer::class.java, *args)
 }

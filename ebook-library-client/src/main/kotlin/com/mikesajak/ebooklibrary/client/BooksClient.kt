@@ -1,6 +1,7 @@
 package com.mikesajak.ebooklibrary.client
 
 import com.mikesajak.ebooklibrary.payload.Book
+import com.mikesajak.ebooklibrary.payload.BookId
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.context.annotation.Bean
@@ -29,4 +30,8 @@ class BooksClient(private val booksRestTemplate: RestTemplate) {
         return result.body?.toList() ?: listOf()
     }
 
+    fun getBook(id: BookId): Book? {
+        val result = booksRestTemplate.getForEntity("/books/${id.value}", Book::class.java)
+        return result.body
+    }
 }

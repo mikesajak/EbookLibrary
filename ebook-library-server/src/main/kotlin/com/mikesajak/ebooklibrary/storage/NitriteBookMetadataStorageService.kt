@@ -16,8 +16,8 @@ class NitriteBookMetadataStorageService(nitriteDbService: NitriteDbService) : Bo
     init {
         bookRepo = nitriteDbService.db.getRepository(Book::class.java)
 
-        if (!bookRepo.hasIndex("id")) {
-            bookRepo.createIndex("id", IndexOptions.indexOptions(IndexType.Unique))
+        if (!bookRepo.hasIndex("id.value")) {
+            bookRepo.createIndex("id.value", IndexOptions.indexOptions(IndexType.Unique))
         }
     }
 
@@ -35,8 +35,8 @@ class NitriteBookMetadataStorageService(nitriteDbService: NitriteDbService) : Bo
     }
 
     override fun getBook(id: BookId): Book? {
-        val cursor = bookRepo.find(eq("id", id))
-        return cursor.first()
+        val cursor = bookRepo.find(eq("id.value", id.value))
+        return cursor.singleOrNull()
     }
 
     override fun listBooks(): List<Book> {
