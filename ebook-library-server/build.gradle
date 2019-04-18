@@ -30,9 +30,6 @@ version '0.1-SNAPSHOT'
 sourceCompatibility = 1.8
 
 repositories {
-    maven {
-        url 'https://github.com/psiegman/mvn-repo/raw/master/releases'
-    }
 }
 
 ext {
