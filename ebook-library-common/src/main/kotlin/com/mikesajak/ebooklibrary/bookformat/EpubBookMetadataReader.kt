@@ -2,8 +2,6 @@ package com.mikesajak.ebooklibrary.bookformat
 
 import com.mikesajak.ebooklibrary.payload.BookData
 import com.mikesajak.ebooklibrary.payload.BookMetadata
-import nl.siegmann.epublib.domain.Date
-import nl.siegmann.epublib.epub.EpubReader
 import java.io.ByteArrayInputStream
 import java.time.LocalDate
 

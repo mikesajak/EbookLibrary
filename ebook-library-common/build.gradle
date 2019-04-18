@@ -40,6 +40,11 @@ dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-reflect'
 //    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion"
 
+    implementation ('nl.siegmann.epublib:epublib-core:3.1') {
+        exclude group: 'org.slf4j'
+        exclude group: 'xmlpull'
+    }
+
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
