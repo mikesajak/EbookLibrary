@@ -2,28 +2,12 @@ package com.mikesajak.ebooklibrary.payload
 
 import java.util.*
 
-data class BookCover(val bookId: BookId, val contentType: String, val filename: String,
-                     val imageData: ByteArray) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as BookCover
-
-        if (bookId != other.bookId) return false
-        if (contentType != other.contentType) return false
-        if (filename != other.filename) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = bookId.hashCode()
-        result = 31 * result + contentType.hashCode()
-        result = 31 * result + filename.hashCode()
-        return result
-    }
+data class BookCover(val bookId: BookId, val coverImage: CoverImage) {
+    constructor(bookId: BookId, name: String, contentType: String, imageData: ByteArray)
+        : this(bookId, CoverImage(name, contentType, imageData))
 }
+
+data class CoverImage(val name: String, val contentType: String, val imageData: ByteArray)
 
 data class BookDataId(val value: String) {
     companion object {
@@ -33,24 +17,6 @@ data class BookDataId(val value: String) {
     override fun toString(): String = value
 }
 
-data class BookData(val id: BookDataId, val type: String, val filename: String, val data: ByteArray) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as BookData
-
-        if (type != other.type) return false
-        if (filename != other.filename) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = type.hashCode()
-        result = 31 * result + filename.hashCode()
-        return result
-    }
-}
+data class BookData(val id: BookDataId, val type: String, val filename: String, val data: ByteArray)
 
 data class BookFormat(val bookId: BookId, val bookData: BookData)

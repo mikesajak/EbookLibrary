@@ -62,10 +62,10 @@ class BookCoverController {
         val cover = bookCoverStorageService.getCover(bookId)
 
         return ResponseEntity.ok()
-            .contentType(MediaType.parseMediaType(cover.contentType))
-            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"${cover.filename}\"")
+            .contentType(MediaType.parseMediaType(cover.coverImage.contentType))
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"${cover.coverImage.contentType}\"")
             .cacheControl(CacheControl.noCache())
-            .body(cover.imageData)
+            .body(cover.coverImage.imageData)
     }
 
     @DeleteMapping("coverImages/{bookId}")

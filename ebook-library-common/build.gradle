@@ -46,7 +46,8 @@ dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-reflect'
 //    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion"
 
-    implementation ('nl.siegmann.epublib:epublib-core:3.1') {
+    implementation('com.positiondev.epublib:epublib-core:3.1') {
+//    implementation ('nl.siegmann.epublib:epublib-core:3.1') {
         exclude group: 'org.slf4j'
         exclude group: 'xmlpull'
     }
@@ -66,3 +67,22 @@ compileTestKotlin {
         jvmTarget = "1.8"
     }
 }
+
+
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+

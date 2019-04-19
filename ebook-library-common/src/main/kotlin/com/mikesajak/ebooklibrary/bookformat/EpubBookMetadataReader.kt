@@ -1,16 +1,27 @@
 package com.mikesajak.ebooklibrary.bookformat
 
-import com.mikesajak.ebooklibrary.payload.BookData
 import com.mikesajak.ebooklibrary.payload.BookMetadata
+import com.mikesajak.ebooklibrary.payload.CoverImage
 import nl.siegmann.epublib.domain.Date
 import nl.siegmann.epublib.epub.EpubReader
 import java.io.ByteArrayInputStream
+import java.io.IOException
 import java.time.LocalDate
 
 class EpubBookMetadataReader : BookMetadataReader("EPUB") {
-    override fun read(bookData: BookData): BookMetadata {
+
+    override fun canRead(bookData: ByteArray): Boolean =
+        try {
+            val reader = EpubReader()
+            reader.readEpub(ByteArrayInputStream(bookData))
+            true
+        } catch (e: IOException) {
+            false
+        }
+
+    override fun read(bookData: ByteArray): BookMetadata {
         val reader = EpubReader()
-        val epub = reader.readEpub(ByteArrayInputStream(bookData.data))
+        val epub = reader.readEpub(ByteArrayInputStream(bookData))
 
         val bookMetaBuilder = BookMetadata.builder(epub.metadata.firstTitle)
         epub.metadata.authors.map { "${it.firstname} ${it.lastname}" }
@@ -39,5 +50,16 @@ class EpubBookMetadataReader : BookMetadataReader("EPUB") {
             bookMetaBuilder.description(descr)
 
         return bookMetaBuilder.build()
+    }
+
+    override fun readCover(bookData: ByteArray): CoverImage? {
+        val reader = EpubReader()
+        val epub = reader.readEpub(ByteArrayInputStream(bookData))
+        val epubImage = epub.coverImage
+
+        return epubImage?.let { imgRes ->
+            val imageName = imgRes.title ?: imgRes.href ?: imgRes.id
+            CoverImage(imageName, epubImage.mediaType.name, epubImage.data)
+        }
     }
 }
