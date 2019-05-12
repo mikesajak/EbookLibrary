@@ -3,9 +3,8 @@ package com.mikesajak.ebooklibrary.storage
 import com.mikesajak.ebooklibrary.payload.BookCover
 import com.mikesajak.ebooklibrary.payload.BookId
 import org.slf4j.LoggerFactory
-import org.springframework.stereotype.Service
 
-@Service
+//@Service
 class DummyBookCoverStorageService : BookCoverStorageService {
     companion object {
         val logger = LoggerFactory.getLogger(DummyBookCoverStorageService::class.java)

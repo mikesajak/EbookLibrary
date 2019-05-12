@@ -1,4 +1,4 @@
-package com.mikesajak.ebooklibrary.storage
+package com.mikesajak.ebooklibrary.storage.nitrite
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 

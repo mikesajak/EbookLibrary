@@ -4,9 +4,9 @@ import com.mikesajak.ebooklibrary.bookformat.BookFormatReaderRegistry
 import com.mikesajak.ebooklibrary.exceptions.BookFormatNotFoundException
 import com.mikesajak.ebooklibrary.exceptions.BookFormatTypeException
 import com.mikesajak.ebooklibrary.exceptions.BookNotFoundException
-import com.mikesajak.ebooklibrary.payload.BookData
-import com.mikesajak.ebooklibrary.payload.BookDataId
 import com.mikesajak.ebooklibrary.payload.BookFormat
+import com.mikesajak.ebooklibrary.payload.BookFormatDto
+import com.mikesajak.ebooklibrary.payload.BookFormatId
 import com.mikesajak.ebooklibrary.payload.BookId
 import com.mikesajak.ebooklibrary.storage.BookFormatStorageService
 import com.mikesajak.ebooklibrary.storage.BookMetadataStorageService
@@ -45,9 +45,9 @@ class BookFormatController {
 
         val filename = file.originalFilename ?: file.name
 
-        val bookDataId = BookDataId.randomId()
-        bookFormatStorageService.storeBookFormat(BookFormat(bookId,
-            BookData(bookDataId, contentType, filename, file.bytes)))
+        val bookDataId = BookFormatId.randomId()
+        bookFormatStorageService.storeBookFormat(BookFormatDto(bookId,
+            BookFormat(bookDataId, contentType, filename, file.bytes)))
 
         val fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
             .path("/bookFormats")
@@ -58,28 +58,28 @@ class BookFormatController {
     }
 
     @GetMapping("bookFormats/{bookId}")
-    fun getBookFormats(@PathVariable bookId: BookId): List<BookDataId> {
+    fun getBookFormats(@PathVariable bookId: BookId): List<BookFormatId> {
         return bookFormatStorageService.getBookFormats(bookId)
     }
 
-    @GetMapping("bookFormats/{bookId}/{bookDataId}")
+    @GetMapping("bookFormats/{bookId}/{bookFormatId}")
     fun getBookFormatData(@PathVariable("bookId") bookId: BookId,
-                          @PathVariable("bookDataId") bookDataId: BookDataId): ResponseEntity<ByteArray> {
+                          @PathVariable("bookFormatId") bookFormatId: BookFormatId): ResponseEntity<ByteArray> {
 
-        val bookFormat = bookFormatStorageService.getBookFormat(bookId, bookDataId)
+        val bookFormat = bookFormatStorageService.getBookFormat(bookId, bookFormatId)
 
         return ResponseEntity.ok()
-            .contentType(MediaType.parseMediaType(bookFormat.bookData.type))
-            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"${bookFormat.bookData.filename}\"")
+            .contentType(MediaType.parseMediaType(bookFormat.bookFormat.type))
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"${bookFormat.bookFormat.filename}\"")
             .cacheControl(CacheControl.noCache())
-            .body(bookFormat.bookData.data)
+            .body(bookFormat.bookFormat.data)
     }
 
-    @DeleteMapping("bookFormats/{bookId}/{bookDataId}")
+    @DeleteMapping("bookFormats/{bookId}/{bookFormatId}")
     fun deleteBookFormat(@PathVariable("bookId") bookId: BookId,
-                         @PathVariable("bookDataId") bookDataId: BookDataId) {
-        if (!bookFormatStorageService.removeBookFormat(bookId, bookDataId))
-            throw BookFormatNotFoundException(bookId, bookDataId)
+                         @PathVariable("bookFormatId") bookFormatId: BookFormatId) {
+        if (!bookFormatStorageService.removeBookFormat(bookId, bookFormatId))
+            throw BookFormatNotFoundException(bookId, bookFormatId)
     }
 
     @DeleteMapping("bookFormats/{bookId}")

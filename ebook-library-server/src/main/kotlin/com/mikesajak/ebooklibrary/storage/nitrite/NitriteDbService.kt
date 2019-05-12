@@ -1,4 +1,4 @@
-package com.mikesajak.ebooklibrary.storage
+package com.mikesajak.ebooklibrary.storage.nitrite
 
 import org.dizitart.kno2.nitrite
 import org.dizitart.no2.Nitrite

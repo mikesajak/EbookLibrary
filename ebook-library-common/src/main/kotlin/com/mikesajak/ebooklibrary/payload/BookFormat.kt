@@ -9,14 +9,14 @@ data class BookCover(val bookId: BookId, val coverImage: CoverImage) {
 
 data class CoverImage(val name: String, val contentType: String, val imageData: ByteArray)
 
-data class BookDataId(val value: String) {
+data class BookFormatId(val value: String) {
     companion object {
-        fun randomId() = BookDataId(UUID.randomUUID().toString())
+        fun randomId() = BookFormatId(UUID.randomUUID().toString())
     }
 
     override fun toString(): String = value
 }
 
-data class BookData(val id: BookDataId, val type: String, val filename: String, val data: ByteArray)
+data class BookFormatDto(val bookId: BookId, val bookFormat: BookFormat)
 
-data class BookFormat(val bookId: BookId, val bookData: BookData)
+data class BookFormat(val id: BookFormatId, val type: String, val filename: String, val data: ByteArray)

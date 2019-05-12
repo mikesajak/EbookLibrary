@@ -1,8 +1,9 @@
-package com.mikesajak.ebooklibrary.storage
+package com.mikesajak.ebooklibrary.storage.nitrite
 
 import com.mikesajak.ebooklibrary.payload.Book
 import com.mikesajak.ebooklibrary.payload.BookId
 import com.mikesajak.ebooklibrary.payload.BookMetadata
+import com.mikesajak.ebooklibrary.storage.BookMetadataStorageService
 import org.dizitart.no2.IndexOptions
 import org.dizitart.no2.IndexType
 import org.dizitart.no2.objects.ObjectRepository
@@ -10,7 +11,8 @@ import org.dizitart.no2.objects.filters.ObjectFilters.eq
 import org.springframework.stereotype.Service
 
 @Service
-class NitriteBookMetadataStorageService(nitriteDbService: NitriteDbService) : BookMetadataStorageService {
+class NitriteBookMetadataStorageService(nitriteDbService: NitriteDbService) :
+    BookMetadataStorageService {
     private val bookRepo: ObjectRepository<Book>
 
     init {
