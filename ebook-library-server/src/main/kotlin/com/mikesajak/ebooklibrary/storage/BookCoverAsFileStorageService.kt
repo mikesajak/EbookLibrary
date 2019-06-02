@@ -6,7 +6,7 @@ import com.mikesajak.ebooklibrary.payload.BookId
 import org.springframework.stereotype.Service
 
 @Service
-class BookCoverAsFileStorageService(val fileStorageService: FileStorageService) : BookCoverStorageService{
+class BookCoverAsFileStorageService(val fileStorageService: FileStorageService) : BookCoverStorageService {
     override fun storeCover(cover: BookCover) {
         fileStorageService.storeFile(cover.coverImage.name,
             cover.bookId, DataType.BookCover, cover.coverImage.contentType, cover.coverImage.imageData)

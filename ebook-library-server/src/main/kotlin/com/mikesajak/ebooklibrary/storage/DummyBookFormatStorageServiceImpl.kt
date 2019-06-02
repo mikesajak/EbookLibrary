@@ -1,33 +1,34 @@
 package com.mikesajak.ebooklibrary.storage
 
-import com.mikesajak.ebooklibrary.payload.BookFormatDto
+import com.mikesajak.ebooklibrary.payload.BookFormat
 import com.mikesajak.ebooklibrary.payload.BookFormatId
+import com.mikesajak.ebooklibrary.payload.BookFormatMetadataDto
 import com.mikesajak.ebooklibrary.payload.BookId
 import org.springframework.stereotype.Service
 
 @Service
 class DummyBookFormatStorageServiceImpl : BookFormatStorageService {
-    override fun storeBookFormat(format: BookFormatDto) {
+    override fun listFormatIds(bookId: BookId): List<BookFormatId> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun getBookFormats(bookId: BookId): List<BookFormatId> {
+    override fun listFormatMetadata(bookId: BookId): List<BookFormatMetadataDto> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun getBookFormat(bookId: BookId, bookFormatId: BookFormatId): BookFormatDto {
+    override fun storeFormat(format: BookFormat): BookFormatId {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun listBookFormats(): List<BookId> {
+    override fun getFormat(formatId: BookFormatId): BookFormat? {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun removeBookFormat(bookId: BookId, bookFormatId: BookFormatId): Boolean {
+    override fun listFormats(): List<BookId> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun removeBookFormats(bookId: BookId): Boolean {
+    override fun deleteFormat(formatId: BookFormatId): Boolean {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }

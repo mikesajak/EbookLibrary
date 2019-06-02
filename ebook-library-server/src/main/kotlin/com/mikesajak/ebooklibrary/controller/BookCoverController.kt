@@ -26,12 +26,8 @@ class BookCoverController {
     @Autowired
     lateinit var bookMetadataStorageService: BookMetadataStorageService
 
-//    @Autowired
-//    lateinit var bookCoverStorageService: BookCoverStorageService
-
     @Autowired
     @Qualifier("bookCoverAsFileStorageService")
-//    lateinit var fileStorageService: FileStorageService
     lateinit var bookCoverStorageService: BookCoverStorageService
 
     @PostMapping("/coverImages/{bookId}")
@@ -51,8 +47,6 @@ class BookCoverController {
         val (contentType, imageBytes) = readImage(file.bytes)
 
         bookCoverStorageService.storeCover(BookCover(bookId, filename, contentType, imageBytes))
-
-//        fileStorageService.storeFile(filename, bookId, DataType.BookCover, contentType, imageBytes)
 
         val fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
             .path("/coverImages")
@@ -84,11 +78,6 @@ class BookCoverController {
     @GetMapping("coverImages/{bookId}")
     fun downloadCoverImage(@PathVariable bookId: BookId): ResponseEntity<ByteArray> {
         val cover = bookCoverStorageService.getCover(bookId)
-//
-//        val cover = fileStorageService.listFiles(bookId, DataType.BookCover).asSequence()
-//            .map { fileStorageService.getFileData(it) }
-//            .filterNotNull()
-//            .firstOrNull()
 
         return if (cover != null)
             ResponseEntity.ok()
@@ -104,20 +93,10 @@ class BookCoverController {
     fun deleteCoverImage(@PathVariable bookId: BookId) {
         if (!bookCoverStorageService.deleteCover(bookId))
             throw BookNotFoundException(bookId)
-
-//        val covers = fileStorageService.listFiles(bookId, DataType.BookCover)
-//        if (covers.isEmpty())
-//            throw BookNotFoundException(bookId)
-//
-//        covers.forEach { fileStorageService.deleteFile(it) }
     }
 
     @GetMapping("coverImages")
     fun listCoverImages(): List<BookId> {
         return bookCoverStorageService.listCovers()
-//        return fileStorageService.listFiles(null, DataType.BookCover)
-//            .map { fileStorageService.getFileMetadata(it) }
-//            .filterNotNull()
-//            .map { it.bookId }
     }
 }
