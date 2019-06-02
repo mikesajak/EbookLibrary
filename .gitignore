@@ -1,5 +1,7 @@
 data/
 .idea/
-*/target/
-*/build/
+.gradle
+target/
+out/
+build/
 test/
