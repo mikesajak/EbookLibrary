@@ -72,7 +72,7 @@ class BookFormatController {
                 logger.warn("Data inconsistent for bookId=$bookId, formatId=$formatId: $bookFormat")
 
             ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(bookFormat.metadata.type))
+                .contentType(MediaType.parseMediaType(bookFormat.metadata.formatType))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"${bookFormat.metadata.filename}\"")
                 .cacheControl(CacheControl.noCache())
                 .body(bookFormat.contents)

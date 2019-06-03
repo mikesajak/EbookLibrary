@@ -8,7 +8,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.time.LocalDate
 
-class EpubBookMetadataReader : BookMetadataReader(BookFormatType("EPUB", "application/epub+zip")) {
+class EpubBookMetadataReader : BookMetadataReader("application/epub+zip") {
 
     override fun canRead(bookData: InputStream): Boolean =
         try {

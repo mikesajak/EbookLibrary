@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service
 class BookFormatAsFileStorageService(val fileStorageService: FileStorageService) : BookFormatStorageService {
     override fun storeFormat(format: BookFormat): BookFormatId {
         val fileId = fileStorageService.storeFile(format.metadata.filename, format.metadata.bookId,
-            DataType.BookFormat, format.metadata.type, format.contents)
+            DataType.BookFormat, format.metadata.formatType, format.contents)
         return BookFormatId(fileId.value)
     }
 

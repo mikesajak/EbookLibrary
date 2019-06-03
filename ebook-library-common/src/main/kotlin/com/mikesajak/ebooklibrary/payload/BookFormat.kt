@@ -22,4 +22,4 @@ data class BookFormatId(val value: String) {
 data class BookFormatMetadataDto(val id: BookFormatId, val metadata: BookFormatMetadata)
 
 data class BookFormat(val metadata: BookFormatMetadata, val contents: ByteArray)
-data class BookFormatMetadata(val bookId: BookId, val type: String, val filename: String)
+data class BookFormatMetadata(val bookId: BookId, val formatType: String, val filename: String)
