@@ -38,7 +38,7 @@ class EbookLibServer {
                     ),
                     BookMetadata(
                         "Książka 3", "Dan Brown", listOf("tag1", "tag2", "tag3"),
-                        listOf(), null, null, null, listOf("angielski"), null
+                        listOf(), null, null, null, listOf("angielski, polski"), null
                     )
                 )
 

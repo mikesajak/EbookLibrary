@@ -11,8 +11,8 @@ import org.dizitart.no2.objects.filters.ObjectFilters.eq
 import org.springframework.stereotype.Service
 
 @Service
-class NitriteBookMetadataStorageService(nitriteDbService: NitriteDbService) :
-    BookMetadataStorageService {
+class NitriteBookMetadataStorageService(nitriteDbService: NitriteDbService) : BookMetadataStorageService {
+    @Suppress("JoinDeclarationAndAssignment")
     private val bookRepo: ObjectRepository<Book>
 
     init {

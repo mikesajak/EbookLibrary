@@ -21,7 +21,7 @@ class BooksController {
     lateinit var bookMetadataStorageService: BookMetadataStorageService
 
     @PostMapping("/books")
-    fun getBook(@RequestParam("book") bookDescr: BookMetadata): String {
+    fun addBook(@RequestParam("book") bookDescr: BookMetadata): String {
         val bookId = bookMetadataStorageService.addBook(bookDescr)
 
         val bookUri = ServletUriComponentsBuilder.fromCurrentContextPath()
@@ -29,11 +29,13 @@ class BooksController {
             .path(bookId.toString())
             .toUriString()
 
+        logger.debug("addBook (POST /books) with $bookDescr, result: $bookUri")
         return bookUri
     }
 
     @PutMapping("/books/{bookId}")
     fun updateBook(@PathVariable bookId: BookId, @RequestParam("book") book: Book) {
+        logger.debug("updateBook (PUT /books/$bookId) with $book")
         if (bookId != book.id) {
             throw InvalidRequestException("The bookId=$bookId is inconsistent with the book id provided in book data (id=${book.id})")
         }
@@ -48,12 +50,21 @@ class BooksController {
     fun getBook(@PathVariable bookId: BookId): ResponseEntity<Book> {
         val book = bookMetadataStorageService.getBook(bookId)
 
+        logger.debug("getBook (GET /books/$bookId), result: $book")
         return ResponseEntity.of(Optional.ofNullable(book))
     }
 
     @GetMapping("books")
-    fun getBookIds() : ResponseEntity<List<Book>> {
+    fun getBooks() : ResponseEntity<List<Book>> {
         val books = bookMetadataStorageService.listBooks()
+        logger.debug("getBookIds (GET /books), result: $books")
+        return ResponseEntity.ok(books)
+    }
+
+    @GetMapping("bookIds")
+    fun getBookIds() : ResponseEntity<List<BookId>> {
+        val books = bookMetadataStorageService.listBooks().map { it.id }
+        logger.debug("getBookIds (GET /books), result: $books")
         return ResponseEntity.ok(books)
     }
 

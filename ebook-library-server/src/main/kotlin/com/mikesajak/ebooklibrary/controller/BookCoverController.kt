@@ -77,6 +77,7 @@ class BookCoverController {
 
     @GetMapping("coverImages/{bookId}")
     fun downloadCoverImage(@PathVariable bookId: BookId): ResponseEntity<ByteArray> {
+        logger.debug("downloadCoverImage (GET /coverImages/$bookId")
         val cover = bookCoverStorageService.getCover(bookId)
 
         return if (cover != null)
@@ -91,12 +92,15 @@ class BookCoverController {
 
     @DeleteMapping("coverImages/{bookId}")
     fun deleteCoverImage(@PathVariable bookId: BookId) {
+        logger.debug("deleteCoverImage (DELETE /coverImages/$bookId")
         if (!bookCoverStorageService.deleteCover(bookId))
             throw BookNotFoundException(bookId)
     }
 
     @GetMapping("coverImages")
     fun listCoverImages(): List<BookId> {
-        return bookCoverStorageService.listCovers()
+        val coversLst = bookCoverStorageService.listCovers()
+        logger.debug("listCoverImages (GET /coverImages), result: $coversLst")
+        return coversLst
     }
 }

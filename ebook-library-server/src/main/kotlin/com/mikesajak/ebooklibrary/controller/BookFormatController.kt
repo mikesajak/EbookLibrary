@@ -38,7 +38,6 @@ class BookFormatController {
     @PostMapping("/bookFormats/{bookId}")
     fun uploadBookFormat(@PathVariable("bookId") bookId: BookId,
                          @RequestParam("file") file: MultipartFile): String {
-
         val contentType = file.contentType ?: throw BookFormatTypeException("No content type for book format provided. ${file.name}")
         val bookReader = bookFormatManager.readerFor(contentType) ?: throw BookFormatTypeException("Unsupported content type for ")
         val bookMetadata = bookMetadataStorageService.getBook(bookId) ?: throw BookNotFoundException(bookId)
@@ -50,6 +49,8 @@ class BookFormatController {
         val formatId = bookFormatStorageService.storeFormat(
             BookFormat(BookFormatMetadata(bookId, contentType, filename), file.bytes))
 
+        logger.debug("uploadBookFormat (POST/bookFormats/$bookId), result: $formatId")
+
         return ServletUriComponentsBuilder.fromCurrentContextPath()
             .path("/bookFormats")
             .path(formatId.toString())
@@ -58,12 +59,15 @@ class BookFormatController {
 
     @GetMapping("bookFormats/{bookId}")
     fun getBookFormats(@PathVariable bookId: BookId): List<BookFormatId> {
-        return bookFormatStorageService.listFormatIds(bookId)
+        val formatIds = bookFormatStorageService.listFormatIds(bookId)
+        logger.debug("getBookFormats (GET /bookFormats/$bookId, result: $formatIds")
+        return formatIds
     }
 
     @GetMapping("bookFormats/{bookId}/{formatId}/contents")
     fun getBookFormatContents(@PathVariable("bookId") bookId: BookId,
                               @PathVariable("formatId") formatId: BookFormatId): ResponseEntity<ByteArray>? {
+        logger.debug("getBookFormatContents (GET /bookFormats/$bookId/$formatId/contents")
 
         val bookFormat = bookFormatStorageService.getFormat(formatId)
 
@@ -71,17 +75,23 @@ class BookFormatController {
             if (bookId != bookFormat.metadata.bookId)
                 logger.warn("Data inconsistent for bookId=$bookId, formatId=$formatId: $bookFormat")
 
+            logger.debug("Returning book format contents for bookId=$bookId, formatId=$formatId: ${bookFormat.contents}")
+
             ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(bookFormat.metadata.formatType))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"${bookFormat.metadata.filename}\"")
                 .cacheControl(CacheControl.noCache())
                 .body(bookFormat.contents)
-        } else throw BookFormatNotFoundException(bookId, formatId)
+        } else {
+            logger.debug("Book format doesn't exist for bookId=$bookId, formatId=$formatId")
+            throw BookFormatNotFoundException(bookId, formatId)
+        }
     }
 
     @GetMapping("bookFormats/{bookId}/{formatId}/metadata")
     fun getBookFormatMetadata(@PathVariable("bookId") bookId: BookId,
                               @PathVariable("formatId") formatId: BookFormatId): BookFormatMetadata? {
+        logger.debug("getBookFormatMetadata (GET /bookFormats/$bookId/$formatId/metadata")
 
         val bookFormat = bookFormatStorageService.getFormat(formatId)
 
@@ -89,22 +99,32 @@ class BookFormatController {
             if (bookId != bookFormat.metadata.bookId)
                 logger.warn("Data inconsistent for bookId=$bookId, formatId=$formatId: $bookFormat")
 
+            logger.debug("result: ${bookFormat.metadata}")
             return bookFormat.metadata
-        } else throw BookFormatNotFoundException(bookId, formatId)
+        } else {
+            logger.debug("Book format does not exist. bookId=$bookId, formatId=$formatId")
+            throw BookFormatNotFoundException(bookId, formatId)
+        }
     }
 
     @DeleteMapping("bookFormats/{bookId}/{bookFormatId}")
     fun deleteBookFormat(@PathVariable("bookId") bookId: BookId,
                          @PathVariable("bookFormatId") bookFormatId: BookFormatId) {
-        if (!bookFormatStorageService.deleteFormat(bookFormatId))
+        logger.debug("deleteBookFormat (DELETE /bookFormats/$bookId/$bookFormatId")
+
+        if (!bookFormatStorageService.deleteFormat(bookFormatId)) {
+            logger.debug("Book format doesn't exist, bookId=$bookId, formatId=$bookFormatId")
             throw BookFormatNotFoundException(bookId, bookFormatId)
+        }
     }
 
     @DeleteMapping("bookFormats/{bookId}")
-    fun deleteBookFormats(@PathVariable("bookId") bookId: BookId) {
+    fun deleteAllBookFormats(@PathVariable("bookId") bookId: BookId) {
         val numDeleted = bookFormatStorageService.listFormatIds(bookId)
             .map { bookFormatStorageService.deleteFormat(it) }
             .count { it == true}
+
+        logger.debug("deleteAllBookFormats (DELETE /bookFormats/$bookId, num deleted: $numDeleted")
 
         if (numDeleted == 0)
             throw BookFormatNotFoundException(bookId)
@@ -112,6 +132,8 @@ class BookFormatController {
 
     @GetMapping("bookFormats")
     fun listBookFormats(): List<BookId> {
-        return bookFormatStorageService.listFormats()
+        val bookFormatsList = bookFormatStorageService.listFormats()
+        logger.debug("listBookFormats (GET /bookFormats), result: $bookFormatsList")
+        return bookFormatsList
     }
 }
