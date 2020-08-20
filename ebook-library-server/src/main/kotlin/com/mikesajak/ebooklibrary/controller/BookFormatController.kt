@@ -47,7 +47,8 @@ class BookFormatController {
         val filename = file.originalFilename ?: file.name
 
         val formatId = bookFormatStorageService.storeFormat(
-            BookFormat(BookFormatMetadata(bookId, contentType, filename), file.bytes))
+            BookFormat(BookFormatMetadata(bookId, contentType, filename), file.bytes)
+        )
 
         logger.debug("uploadBookFormat (POST/bookFormats/$bookId), result: $formatId")
 
@@ -66,7 +67,8 @@ class BookFormatController {
 
     @GetMapping("bookFormats/{bookId}/{formatId}/contents")
     fun getBookFormatContents(@PathVariable("bookId") bookId: BookId,
-                              @PathVariable("formatId") formatId: BookFormatId): ResponseEntity<ByteArray>? {
+                              @PathVariable("formatId") formatId: BookFormatId
+    ): ResponseEntity<ByteArray>? {
         logger.debug("getBookFormatContents (GET /bookFormats/$bookId/$formatId/contents")
 
         val bookFormat = bookFormatStorageService.getFormat(formatId)
@@ -90,7 +92,8 @@ class BookFormatController {
 
     @GetMapping("bookFormats/{bookId}/{formatId}/metadata")
     fun getBookFormatMetadata(@PathVariable("bookId") bookId: BookId,
-                              @PathVariable("formatId") formatId: BookFormatId): BookFormatMetadata? {
+                              @PathVariable("formatId") formatId: BookFormatId
+    ): BookFormatMetadata? {
         logger.debug("getBookFormatMetadata (GET /bookFormats/$bookId/$formatId/metadata")
 
         val bookFormat = bookFormatStorageService.getFormat(formatId)
@@ -109,7 +112,8 @@ class BookFormatController {
 
     @DeleteMapping("bookFormats/{bookId}/{bookFormatId}")
     fun deleteBookFormat(@PathVariable("bookId") bookId: BookId,
-                         @PathVariable("bookFormatId") bookFormatId: BookFormatId) {
+                         @PathVariable("bookFormatId") bookFormatId: BookFormatId
+    ) {
         logger.debug("deleteBookFormat (DELETE /bookFormats/$bookId/$bookFormatId")
 
         if (!bookFormatStorageService.deleteFormat(bookFormatId)) {

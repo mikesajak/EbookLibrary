@@ -33,6 +33,8 @@ class NitriteBookCoverStorageService(nitriteDbService: NitriteDbService) : BookC
         return cursor.singleOrNull()
     }
 
+    override fun numCovers(): Long = bookCoverRepo.size()
+
     override fun listCovers(): List<BookId> {
         return bookCoverRepo.find()
             .map { it.bookId }

@@ -17,6 +17,10 @@ class DummyBookCoverStorageService : BookCoverStorageService {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
+    override fun numCovers(): Long {
+        TODO("Not yet implemented")
+    }
+
     override fun listCovers(): List<BookId> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }

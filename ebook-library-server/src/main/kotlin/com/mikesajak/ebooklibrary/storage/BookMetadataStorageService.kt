@@ -9,4 +9,6 @@ interface BookMetadataStorageService {
     fun updateBook(book: Book)
     fun getBook(id: BookId): Book?
     fun listBooks(): List<Book>
+    fun findBooks(query: String?): List<Book>
+    fun numBooks(): Long
 }

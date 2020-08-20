@@ -23,6 +23,8 @@ class BookCoverAsFileStorageService(val fileStorageService: FileStorageService) 
         }
     }
 
+    override fun numCovers(): Long = fileStorageService.numFiles()
+
     override fun listCovers(): List<BookId> =
         fileStorageService.listFiles()
             .map { fileStorageService.getFileData(it) }

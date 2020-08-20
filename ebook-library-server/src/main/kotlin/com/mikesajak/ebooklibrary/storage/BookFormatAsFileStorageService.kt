@@ -32,7 +32,7 @@ class BookFormatAsFileStorageService(val fileStorageService: FileStorageService)
         fileStorageService.listFiles(bookId, DataType.BookFormat)
             .map { BookFormatId(it.value) }
 
-    override fun listFormatMetadata(bookId:BookId): List<BookFormatMetadataDto> {
+    override fun listFormatMetadata(bookId: BookId): List<BookFormatMetadataDto> {
         return fileStorageService.listFiles(bookId, DataType.BookFormat)
             .map { fileId -> fileStorageService.getFileMetadata(fileId)?.let {
                 Pair(BookFormatId(fileId.value), it)
@@ -49,4 +49,6 @@ class BookFormatAsFileStorageService(val fileStorageService: FileStorageService)
 
     override fun deleteFormat(formatId: BookFormatId): Boolean =
         fileStorageService.deleteFile(FileId(formatId.value))
+
+    override fun numFormats(): Long = fileStorageService.numFiles()
 }

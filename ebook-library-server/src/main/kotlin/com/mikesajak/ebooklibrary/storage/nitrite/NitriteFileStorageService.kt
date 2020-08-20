@@ -36,6 +36,8 @@ class NitriteFileStorageService(nitriteDbService: NitriteDbService) : FileStorag
         return id
     }
 
+    override fun numFiles(): Long = filesRepo.size()
+
     override fun listFiles(): List<FileId> {
         return filesRepo.find()
             .map { it.id }

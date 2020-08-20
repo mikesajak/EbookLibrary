@@ -11,7 +11,8 @@ import org.dizitart.no2.objects.filters.ObjectFilters.eq
 import org.springframework.stereotype.Service
 
 @Service
-class NitriteBookMetadataStorageService(nitriteDbService: NitriteDbService) : BookMetadataStorageService {
+class NitriteBookMetadataStorageService(private val nitriteDbService: NitriteDbService,
+                                        private val queryParser: RSQLToNitriteQueryParser) : BookMetadataStorageService {
     @Suppress("JoinDeclarationAndAssignment")
     private val bookRepo: ObjectRepository<Book>
 
@@ -42,6 +43,19 @@ class NitriteBookMetadataStorageService(nitriteDbService: NitriteDbService) : Bo
     }
 
     override fun listBooks(): List<Book> {
-        return bookRepo.find().toList()
+        return bookRepo.find()
+            .toList()
     }
+
+    override fun findBooks(query: String?): List<Book> {
+        if (query == null || query.isBlank()) {
+            return listBooks()
+        } else {
+            val nitriteFilter = queryParser.parse(query)
+            return bookRepo.find(nitriteFilter)
+                .toList()
+        }
+    }
+
+    override fun numBooks(): Long = bookRepo.size()
 }

@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service
 import java.nio.file.Paths
 
 @Service
-class NitriteDbService(val properties: NitriteStorageProperties) {
+class NitriteDbService(properties: NitriteStorageProperties) {
     final val db: Nitrite
 
     init {

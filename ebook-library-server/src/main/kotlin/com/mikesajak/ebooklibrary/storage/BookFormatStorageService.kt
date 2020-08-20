@@ -19,4 +19,5 @@ interface BookFormatStorageService {
     fun listFormatMetadata(bookId: BookId): List<BookFormatMetadataDto>
     fun listFormats(): List<BookId>
     fun deleteFormat(formatId: BookFormatId): Boolean
+    fun numFormats(): Long
 }

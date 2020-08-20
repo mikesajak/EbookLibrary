@@ -24,6 +24,10 @@ class DummyBookFormatStorageServiceImpl : BookFormatStorageService {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
+    override fun numFormats(): Long {
+        TODO("Not yet implemented")
+    }
+
     override fun listFormats(): List<BookId> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }

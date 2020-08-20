@@ -21,7 +21,7 @@ class BooksController {
     lateinit var bookMetadataStorageService: BookMetadataStorageService
 
     @PostMapping("/books")
-    fun addBook(@RequestParam("book") bookDescr: BookMetadata): String {
+    fun addBook(@RequestBody bookDescr: BookMetadata): String {
         val bookId = bookMetadataStorageService.addBook(bookDescr)
 
         val bookUri = ServletUriComponentsBuilder.fromCurrentContextPath()
@@ -34,7 +34,7 @@ class BooksController {
     }
 
     @PutMapping("/books/{bookId}")
-    fun updateBook(@PathVariable bookId: BookId, @RequestParam("book") book: Book) {
+    fun updateBook(@PathVariable bookId: BookId, @RequestBody book: Book) {
         logger.debug("updateBook (PUT /books/$bookId) with $book")
         if (bookId != book.id) {
             throw InvalidRequestException("The bookId=$bookId is inconsistent with the book id provided in book data (id=${book.id})")
@@ -55,17 +55,19 @@ class BooksController {
     }
 
     @GetMapping("books")
-    fun getBooks() : ResponseEntity<List<Book>> {
-        val books = bookMetadataStorageService.listBooks()
-        logger.debug("getBookIds (GET /books), result: $books")
+    fun getBooks(@RequestParam(required = false) query: String?) : ResponseEntity<List<Book>> {
+        val books = if (query == null) bookMetadataStorageService.listBooks()
+                    else bookMetadataStorageService.findBooks(query)
+        logger.debug("getBookIds (GET /books?query=$query), result: $books")
         return ResponseEntity.ok(books)
     }
 
     @GetMapping("bookIds")
-    fun getBookIds() : ResponseEntity<List<BookId>> {
-        val books = bookMetadataStorageService.listBooks().map { it.id }
-        logger.debug("getBookIds (GET /books), result: $books")
-        return ResponseEntity.ok(books)
+    fun getBookIds(@RequestParam(required = false) query: String?) : ResponseEntity<List<BookId>> {
+        val books = if (query == null) bookMetadataStorageService.listBooks()
+                    else bookMetadataStorageService.findBooks(query)
+        val bookIds = books.map { it.id }
+        logger.debug("getBookIds (GET /books?query=$query), result: $books")
+        return ResponseEntity.ok(bookIds)
     }
-
 }
