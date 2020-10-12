@@ -1,6 +1,7 @@
 package com.mikesajak.ebooklibrary.controller
 
-import com.mikesajak.ebooklibrary.payload.ServerInfo
+import com.mikesajak.ebooklibrary.controller.dto.LibraryInfo
+import com.mikesajak.ebooklibrary.controller.dto.ServerInfo
 import com.mikesajak.ebooklibrary.storage.BookCoverStorageService
 import com.mikesajak.ebooklibrary.storage.BookFormatStorageService
 import com.mikesajak.ebooklibrary.storage.BookMetadataStorageService
@@ -24,11 +25,17 @@ class StatusController {
     lateinit var bookCoverStorageService: BookCoverStorageService
 
     @GetMapping("info")
-    fun getStatus(): ServerInfo {
-        logger.debug("getStatus (GET /info)")
+    fun getServerInfo(): ServerInfo {
+        logger.trace("getServerInfo (GET /info)")
 
-        return ServerInfo("EbookLibServer", "0.1",
-            bookMetadataStorageService.numBooks(), bookFormatStorageService.numFormats(),
+        return ServerInfo("EbookLibServer", "0.1")
+    }
+
+    @GetMapping("libraryInfo")
+    fun getLibraryInfo(): LibraryInfo {
+        logger.debug("getLibraryInfo (GET /stats)")
+
+        return LibraryInfo(getServerInfo(), bookMetadataStorageService.numBooks(), bookFormatStorageService.numFormats(),
             bookCoverStorageService.numCovers())
     }
 }

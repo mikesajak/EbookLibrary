@@ -1,9 +1,9 @@
 package com.mikesajak.ebooklibrary.storage
 
-import com.mikesajak.ebooklibrary.payload.BookFormat
-import com.mikesajak.ebooklibrary.payload.BookFormatId
-import com.mikesajak.ebooklibrary.payload.BookFormatMetadataDto
-import com.mikesajak.ebooklibrary.payload.BookId
+import com.mikesajak.ebooklibrary.model.BookFormat
+import com.mikesajak.ebooklibrary.model.BookFormatId
+import com.mikesajak.ebooklibrary.model.BookFormatMetadataDto
+import com.mikesajak.ebooklibrary.model.BookId
 
 interface BookFormatStorageService {
 //    fun storeBookFormat(format: BookFormatDto)
@@ -18,6 +18,7 @@ interface BookFormatStorageService {
     fun listFormatIds(bookId: BookId): List<BookFormatId>
     fun listFormatMetadata(bookId: BookId): List<BookFormatMetadataDto>
     fun listFormats(): List<BookId>
-    fun deleteFormat(formatId: BookFormatId): Boolean
+    fun removeFormat(formatId: BookFormatId): Boolean
+    fun removeFormats(bookId:BookId): Int
     fun numFormats(): Long
 }

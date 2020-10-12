@@ -4,10 +4,10 @@ import com.mikesajak.ebooklibrary.bookformat.BookFormatReaderRegistry
 import com.mikesajak.ebooklibrary.exceptions.BookFormatNotFoundException
 import com.mikesajak.ebooklibrary.exceptions.BookFormatTypeException
 import com.mikesajak.ebooklibrary.exceptions.BookNotFoundException
-import com.mikesajak.ebooklibrary.payload.BookFormat
-import com.mikesajak.ebooklibrary.payload.BookFormatId
-import com.mikesajak.ebooklibrary.payload.BookFormatMetadata
-import com.mikesajak.ebooklibrary.payload.BookId
+import com.mikesajak.ebooklibrary.model.BookFormat
+import com.mikesajak.ebooklibrary.model.BookFormatId
+import com.mikesajak.ebooklibrary.model.BookFormatMetadata
+import com.mikesajak.ebooklibrary.model.BookId
 import com.mikesajak.ebooklibrary.storage.BookFormatStorageService
 import com.mikesajak.ebooklibrary.storage.BookMetadataStorageService
 import org.slf4j.LoggerFactory
@@ -19,6 +19,7 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
+import org.springframework.web.servlet.mvc.support.RedirectAttributes
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 
 @RestController
@@ -34,6 +35,16 @@ class BookFormatController {
 
     @Autowired
     lateinit var bookFormatManager: BookFormatReaderRegistry
+
+    @PostMapping("/bookFormats")
+    fun uploadTestFormat(@RequestParam("file") file: MultipartFile,
+                         redirectAttributes: RedirectAttributes): String {
+        val contentType = file.contentType ?: throw BookFormatTypeException("No content type for book format provided. ${file.name}")
+        logger.info("Received contentType=$contentType")
+
+        redirectAttributes.addFlashAttribute("message", "You successfully uploaded ${file.originalFilename}")
+        return "redirect:/"
+    }
 
     @PostMapping("/bookFormats/{bookId}")
     fun uploadBookFormat(@PathVariable("bookId") bookId: BookId,
@@ -67,8 +78,7 @@ class BookFormatController {
 
     @GetMapping("bookFormats/{bookId}/{formatId}/contents")
     fun getBookFormatContents(@PathVariable("bookId") bookId: BookId,
-                              @PathVariable("formatId") formatId: BookFormatId
-    ): ResponseEntity<ByteArray>? {
+                              @PathVariable("formatId") formatId: BookFormatId): ResponseEntity<ByteArray>? {
         logger.debug("getBookFormatContents (GET /bookFormats/$bookId/$formatId/contents")
 
         val bookFormat = bookFormatStorageService.getFormat(formatId)
@@ -92,8 +102,7 @@ class BookFormatController {
 
     @GetMapping("bookFormats/{bookId}/{formatId}/metadata")
     fun getBookFormatMetadata(@PathVariable("bookId") bookId: BookId,
-                              @PathVariable("formatId") formatId: BookFormatId
-    ): BookFormatMetadata? {
+                              @PathVariable("formatId") formatId: BookFormatId): BookFormatMetadata? {
         logger.debug("getBookFormatMetadata (GET /bookFormats/$bookId/$formatId/metadata")
 
         val bookFormat = bookFormatStorageService.getFormat(formatId)
@@ -112,11 +121,10 @@ class BookFormatController {
 
     @DeleteMapping("bookFormats/{bookId}/{bookFormatId}")
     fun deleteBookFormat(@PathVariable("bookId") bookId: BookId,
-                         @PathVariable("bookFormatId") bookFormatId: BookFormatId
-    ) {
+                         @PathVariable("bookFormatId") bookFormatId: BookFormatId) {
         logger.debug("deleteBookFormat (DELETE /bookFormats/$bookId/$bookFormatId")
 
-        if (!bookFormatStorageService.deleteFormat(bookFormatId)) {
+        if (!bookFormatStorageService.removeFormat(bookFormatId)) {
             logger.debug("Book format doesn't exist, bookId=$bookId, formatId=$bookFormatId")
             throw BookFormatNotFoundException(bookId, bookFormatId)
         }
@@ -125,7 +133,7 @@ class BookFormatController {
     @DeleteMapping("bookFormats/{bookId}")
     fun deleteAllBookFormats(@PathVariable("bookId") bookId: BookId) {
         val numDeleted = bookFormatStorageService.listFormatIds(bookId)
-            .map { bookFormatStorageService.deleteFormat(it) }
+            .map { bookFormatStorageService.removeFormat(it) }
             .count { it == true}
 
         logger.debug("deleteAllBookFormats (DELETE /bookFormats/$bookId, num deleted: $numDeleted")

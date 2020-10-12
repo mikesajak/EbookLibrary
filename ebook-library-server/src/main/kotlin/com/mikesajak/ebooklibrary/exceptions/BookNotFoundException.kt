@@ -1,6 +1,6 @@
 package com.mikesajak.ebooklibrary.exceptions
 
-import com.mikesajak.ebooklibrary.payload.BookId
+import com.mikesajak.ebooklibrary.model.BookId
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ResponseStatus
 

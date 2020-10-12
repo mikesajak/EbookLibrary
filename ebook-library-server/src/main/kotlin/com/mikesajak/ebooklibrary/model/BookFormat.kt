@@ -1,4 +1,4 @@
-package com.mikesajak.ebooklibrary.payload
+package com.mikesajak.ebooklibrary.model
 
 import java.util.*
 

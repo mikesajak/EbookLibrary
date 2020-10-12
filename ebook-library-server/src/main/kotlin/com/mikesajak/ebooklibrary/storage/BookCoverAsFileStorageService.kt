@@ -1,8 +1,8 @@
 package com.mikesajak.ebooklibrary.storage
 
 import com.mikesajak.ebooklibrary.bookformat.DataType
-import com.mikesajak.ebooklibrary.payload.BookCover
-import com.mikesajak.ebooklibrary.payload.BookId
+import com.mikesajak.ebooklibrary.model.BookCover
+import com.mikesajak.ebooklibrary.model.BookId
 import org.springframework.stereotype.Service
 
 @Service

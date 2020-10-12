@@ -1,6 +1,6 @@
 package com.mikesajak.ebooklibrary.bookformat
 
-import com.mikesajak.ebooklibrary.payload.BookId
+import com.mikesajak.ebooklibrary.model.BookId
 
 data class FileData(val id: FileId, val metadata: FileMetadata, val contents: ByteArray) {
     constructor(id: FileId, bookId: BookId, name: String, dataType: DataType, contentType: String, contents: ByteArray)

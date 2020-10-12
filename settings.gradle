@@ -1,5 +1,3 @@
 rootProject.name = "ebook-library"
 
-include 'ebook-library-common'
 include 'ebook-library-server'
-include 'ebook-library-client'

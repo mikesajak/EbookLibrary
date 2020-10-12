@@ -1,9 +1,9 @@
 package com.mikesajak.ebooklibrary.storage
 
-import com.mikesajak.ebooklibrary.payload.BookFormat
-import com.mikesajak.ebooklibrary.payload.BookFormatId
-import com.mikesajak.ebooklibrary.payload.BookFormatMetadataDto
-import com.mikesajak.ebooklibrary.payload.BookId
+import com.mikesajak.ebooklibrary.model.BookFormat
+import com.mikesajak.ebooklibrary.model.BookFormatId
+import com.mikesajak.ebooklibrary.model.BookFormatMetadataDto
+import com.mikesajak.ebooklibrary.model.BookId
 import org.springframework.stereotype.Service
 
 @Service
@@ -32,7 +32,11 @@ class DummyBookFormatStorageServiceImpl : BookFormatStorageService {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun deleteFormat(formatId: BookFormatId): Boolean {
+    override fun removeFormat(formatId: BookFormatId): Boolean {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun removeFormats(bookId: BookId): Int {
+        TODO("Not yet implemented")
     }
 }

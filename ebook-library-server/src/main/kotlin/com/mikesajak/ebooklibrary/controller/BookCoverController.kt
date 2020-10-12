@@ -2,8 +2,8 @@ package com.mikesajak.ebooklibrary.controller
 
 import com.mikesajak.ebooklibrary.exceptions.BookNotFoundException
 import com.mikesajak.ebooklibrary.exceptions.ImageCoverTypeException
-import com.mikesajak.ebooklibrary.payload.BookCover
-import com.mikesajak.ebooklibrary.payload.BookId
+import com.mikesajak.ebooklibrary.model.BookCover
+import com.mikesajak.ebooklibrary.model.BookId
 import com.mikesajak.ebooklibrary.storage.BookCoverStorageService
 import com.mikesajak.ebooklibrary.storage.BookMetadataStorageService
 import org.slf4j.LoggerFactory

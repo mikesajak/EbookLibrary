@@ -1,8 +1,8 @@
 package com.mikesajak.ebooklibrary
 
-import com.mikesajak.ebooklibrary.payload.BookCover
-import com.mikesajak.ebooklibrary.payload.BookMetadata
-import com.mikesajak.ebooklibrary.payload.CoverImage
+import com.mikesajak.ebooklibrary.model.BookCover
+import com.mikesajak.ebooklibrary.model.BookMetadata
+import com.mikesajak.ebooklibrary.model.CoverImage
 import com.mikesajak.ebooklibrary.storage.BookCoverAsFileStorageService
 import com.mikesajak.ebooklibrary.storage.BookMetadataStorageService
 import com.mikesajak.ebooklibrary.storage.FileStorageProperties

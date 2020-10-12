@@ -4,7 +4,7 @@ import com.mikesajak.ebooklibrary.bookformat.DataType
 import com.mikesajak.ebooklibrary.bookformat.FileData
 import com.mikesajak.ebooklibrary.bookformat.FileId
 import com.mikesajak.ebooklibrary.bookformat.FileMetadata
-import com.mikesajak.ebooklibrary.payload.BookId
+import com.mikesajak.ebooklibrary.model.BookId
 
 interface FileStorageService {
 //    fun storeFile(file: MultipartFile, bookId: BookId, dataType: DataType): FileId

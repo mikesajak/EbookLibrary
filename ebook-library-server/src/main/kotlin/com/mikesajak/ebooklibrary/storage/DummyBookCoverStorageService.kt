@@ -1,7 +1,7 @@
 package com.mikesajak.ebooklibrary.storage
 
-import com.mikesajak.ebooklibrary.payload.BookCover
-import com.mikesajak.ebooklibrary.payload.BookId
+import com.mikesajak.ebooklibrary.model.BookCover
+import com.mikesajak.ebooklibrary.model.BookId
 import org.slf4j.LoggerFactory
 
 //@Service

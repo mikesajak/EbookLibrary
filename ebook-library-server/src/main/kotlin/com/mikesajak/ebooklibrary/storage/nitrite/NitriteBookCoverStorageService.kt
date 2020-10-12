@@ -1,7 +1,7 @@
 package com.mikesajak.ebooklibrary.storage.nitrite
 
-import com.mikesajak.ebooklibrary.payload.BookCover
-import com.mikesajak.ebooklibrary.payload.BookId
+import com.mikesajak.ebooklibrary.model.BookCover
+import com.mikesajak.ebooklibrary.model.BookId
 import com.mikesajak.ebooklibrary.storage.BookCoverStorageService
 import org.dizitart.no2.IndexOptions
 import org.dizitart.no2.IndexType

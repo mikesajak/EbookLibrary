@@ -1,9 +1,9 @@
-package com.mikesajak.ebooklibrary.payload
+package com.mikesajak.ebooklibrary.model
 
 import java.time.LocalDate
 import java.util.*
 
-data class BookId(val value: String) : Comparable<BookId>{
+data class BookId(val value: String) : Comparable<BookId> {
     override fun compareTo(other: BookId): Int =
         value.compareTo(other.value)
 

@@ -4,7 +4,7 @@ import com.mikesajak.ebooklibrary.bookformat.DataType
 import com.mikesajak.ebooklibrary.bookformat.FileData
 import com.mikesajak.ebooklibrary.bookformat.FileId
 import com.mikesajak.ebooklibrary.bookformat.FileMetadata
-import com.mikesajak.ebooklibrary.payload.BookId
+import com.mikesajak.ebooklibrary.model.BookId
 import com.mikesajak.ebooklibrary.storage.FileStorageService
 import org.dizitart.no2.IndexOptions
 import org.dizitart.no2.IndexType

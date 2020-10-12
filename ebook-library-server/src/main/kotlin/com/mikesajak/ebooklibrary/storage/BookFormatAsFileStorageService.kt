@@ -2,7 +2,7 @@ package com.mikesajak.ebooklibrary.storage
 
 import com.mikesajak.ebooklibrary.bookformat.DataType
 import com.mikesajak.ebooklibrary.bookformat.FileId
-import com.mikesajak.ebooklibrary.payload.*
+import com.mikesajak.ebooklibrary.model.*
 import org.springframework.stereotype.Service
 
 @Service
@@ -47,8 +47,17 @@ class BookFormatAsFileStorageService(val fileStorageService: FileStorageService)
             .filterNotNull()
             .map { it.metadata.bookId }
 
-    override fun deleteFormat(formatId: BookFormatId): Boolean =
+    override fun removeFormat(formatId: BookFormatId): Boolean =
         fileStorageService.deleteFile(FileId(formatId.value))
+
+    override fun removeFormats(bookId: BookId): Int {
+        val formatIds = fileStorageService.listFiles(bookId, DataType.BookFormat)
+            .map { BookFormatId(it.value) }
+
+        return formatIds.map { fId -> fileStorageService.deleteFile(FileId(fId.value)) }
+            .filter{ deleted -> deleted }
+            .count()
+    }
 
     override fun numFormats(): Long = fileStorageService.numFiles()
 }
