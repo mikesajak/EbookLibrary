@@ -17,9 +17,5 @@ data class BookFormatId(val value: String) {
     override fun toString(): String = value
 }
 
-//data class BookFormatDto(val bookId: BookId, val bookFormat: BookFormat)
-
-data class BookFormatMetadataDto(val id: BookFormatId, val metadata: BookFormatMetadata)
-
-data class BookFormat(val metadata: BookFormatMetadata, val contents: ByteArray)
-data class BookFormatMetadata(val bookId: BookId, val formatType: String, val filename: String)
+data class BookFormat(val bookFormatId: BookFormatId, val metadata: BookFormatMetadata, val contents: ByteArray)
+data class BookFormatMetadata(val bookFormatId: BookFormatId, val bookId: BookId, val formatType: String, val size: Int, val filename: String)
