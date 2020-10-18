@@ -19,7 +19,7 @@ data class BookDto(val id: String?,
 
 data class SeriesDto(val title: String, val number: Int)
 
-data class BookFormatMetadataDto(val bookFormatId: BookFormatId,
+data class BookFormatMetadataDto(val id: BookFormatId,
                                  val bookId: BookId,
                                  val formatType: String,
                                  val size: Int)
