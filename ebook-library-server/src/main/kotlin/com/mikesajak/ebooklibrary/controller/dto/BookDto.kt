@@ -15,7 +15,7 @@ data class BookDto(val id: String?,
                    val languages: List<String>,
                    val series: SeriesDto?,
                    val description: String?,
-                   val formatIds: List<String>?)
+                   val formats: List<BookFormatMetadataDto>)
 
 data class SeriesDto(val title: String, val number: Int)
 

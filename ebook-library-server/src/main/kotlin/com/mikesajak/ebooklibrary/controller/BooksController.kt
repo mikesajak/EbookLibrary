@@ -1,14 +1,12 @@
 package com.mikesajak.ebooklibrary.controller
 
 import com.mikesajak.ebooklibrary.controller.dto.BookDto
+import com.mikesajak.ebooklibrary.controller.dto.BookFormatMetadataDto
 import com.mikesajak.ebooklibrary.controller.dto.SeriesDto
 import com.mikesajak.ebooklibrary.exceptions.BookAlreadyExistsException
 import com.mikesajak.ebooklibrary.exceptions.BookNotFoundException
 import com.mikesajak.ebooklibrary.exceptions.InvalidRequestException
-import com.mikesajak.ebooklibrary.model.Book
-import com.mikesajak.ebooklibrary.model.BookId
-import com.mikesajak.ebooklibrary.model.BookMetadata
-import com.mikesajak.ebooklibrary.model.Series
+import com.mikesajak.ebooklibrary.model.*
 import com.mikesajak.ebooklibrary.storage.BookFormatStorageService
 import com.mikesajak.ebooklibrary.storage.BookMetadataStorageService
 import org.slf4j.LoggerFactory
@@ -81,10 +79,10 @@ class BooksController {
             throw BookNotFoundException(bookId)
         }
 
-        val formats = bookFormatStorageService.listFormatIds(bookId)
+        val formats = bookFormatStorageService.listFormatMetadata(bookId)
         logger.debug("Returning book formats for bookId=$bookId: $formats")
 
-        val bookDto = mkBookDto(book, formats.map { it.value })
+        val bookDto = mkBookDto(book, formats)
 
         return bookDto
     }
@@ -116,8 +114,8 @@ class BooksController {
         logger.debug("getBooks (GET /books?query=$query), result: $books")
 
         val bookDtoList = books.map { book ->
-            val bookFormats = bookFormatStorageService.listFormatIds(book.id)
-            mkBookDto(book, bookFormats.map { it.value })
+            val bookFormats = bookFormatStorageService.listFormatMetadata(book.id)
+            mkBookDto(book, bookFormats)
         }
 
         return bookDtoList
@@ -132,13 +130,13 @@ class BooksController {
         return ResponseEntity.ok(bookIds)
     }
 
-    private fun mkBookDto(book: Book, bookFormats: List<String>?) =
+    private fun mkBookDto(book: Book, bookFormats: List<BookFormatMetadata>) =
         book.metadata.let { meta ->
             BookDto(book.id.value, meta.title, meta.authors, meta.tags,
                 meta.identifiers, meta.creationDate, meta.publicationDate, meta.publisher, meta.languages,
                 meta.series?.let { SeriesDto(it.title, it.number) },
                 meta.description,
-                bookFormats
+                bookFormats.map { fmt -> BookFormatMetadataDto(fmt.bookFormatId, fmt.bookId, fmt.formatType, fmt.size) }
             )
         }
 
