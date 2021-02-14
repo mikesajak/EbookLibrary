@@ -1,12 +1,13 @@
 package com.mikesajak.ebooklibrary.controller
 
 import com.mikesajak.ebooklibrary.bookformat.BookFormatReaderRegistry
+import com.mikesajak.ebooklibrary.bookformat.BookMetadataReader
+import com.mikesajak.ebooklibrary.controller.dto.BookDtoConverter
 import com.mikesajak.ebooklibrary.controller.dto.BookFormatMetadataDto
 import com.mikesajak.ebooklibrary.exceptions.BookFormatNotFoundException
 import com.mikesajak.ebooklibrary.exceptions.BookFormatTypeException
 import com.mikesajak.ebooklibrary.exceptions.BookNotFoundException
 import com.mikesajak.ebooklibrary.model.BookFormatId
-import com.mikesajak.ebooklibrary.model.BookFormatMetadata
 import com.mikesajak.ebooklibrary.model.BookId
 import com.mikesajak.ebooklibrary.storage.BookFormatStorageService
 import com.mikesajak.ebooklibrary.storage.BookMetadataStorageService
@@ -23,20 +24,24 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import java.io.ByteArrayInputStream
 
+
 @Suppress("unused")
 @RestController
 class BookFormatController {
     private val logger = LoggerFactory.getLogger(BookFormatController::class.java)
 
     @Autowired
-    lateinit var bookMetadataStorageService: BookMetadataStorageService
+    private lateinit var bookMetadataStorageService: BookMetadataStorageService
 
     @Autowired
     @Qualifier("bookFormatAsFileStorageService")
-    lateinit var bookFormatStorageService: BookFormatStorageService
+    private lateinit var bookFormatStorageService: BookFormatStorageService
 
     @Autowired
-    lateinit var bookFormatManager: BookFormatReaderRegistry
+    private lateinit var bookFormatManager: BookFormatReaderRegistry
+
+    @Autowired
+    private lateinit var bookDtoConverter: BookDtoConverter
 
     @PostMapping("/bookFormats")
     fun uploadTestFormat(@RequestParam("file") file: MultipartFile,
@@ -48,21 +53,29 @@ class BookFormatController {
         return "redirect:/"
     }
 
+    private var dryRun = true
+
     @PostMapping("/bookFormats/{bookId}")
     fun uploadBookFormat(@PathVariable("bookId") bookId: BookId,
+//                         @RequestParam("formatMetadata") bookFormatMetadataDto: BookFormatMetadataDto?,
+                         @RequestParam("formatType") formatType: String?,
                          @RequestParam("file") file: MultipartFile): String {
-        val bookReader = bookFormatManager.readers.firstOrNull { it.canRead(ByteArrayInputStream(file.bytes)) }
-            ?: throw BookFormatTypeException("Unsupported content type, cannot read book format")
+        val endpointId = "uploadBookFormat (POST/bookFormats/$bookId)"
+
+//        val mimeType = bookFormatMetadataDto?.formatType ?: getBookMetadataReader(file).mimeType
+        val mimeType = formatType ?: getBookMetadataReader(file).mimeType
 
         val bookMetadata = bookMetadataStorageService.getBook(bookId) ?: throw BookNotFoundException(bookId)
 
+        logger.debug("$endpointId, found bookMetadata for format: bookMetadata: $bookMetadata")
         // TODO: book format validation
 
         val filename = file.originalFilename ?: file.name
 
-        val formatId = bookFormatStorageService.storeFormat(bookId, bookReader.mimeType, filename, file.bytes)
+        val formatId = if (!dryRun) bookFormatStorageService.storeFormat(bookId, mimeType, filename, file.bytes)
+                       else BookFormatId("testFormatId")
 
-        logger.debug("uploadBookFormat (POST/bookFormats/$bookId), result: $formatId")
+        logger.debug("$endpointId, result: $formatId")
 
         return ServletUriComponentsBuilder.fromCurrentContextPath()
             .path("/bookFormats")
@@ -70,11 +83,17 @@ class BookFormatController {
             .toUriString()
     }
 
+    private fun getBookMetadataReader(file: MultipartFile): BookMetadataReader {
+        val bookReader = bookFormatManager.readers.firstOrNull { it.canRead(ByteArrayInputStream(file.bytes)) }
+            ?: throw BookFormatTypeException("Unsupported content type, cannot read book format")
+        return bookReader
+    }
+
     @GetMapping("bookFormats/{bookId}")
     fun getBookFormats(@PathVariable bookId: BookId): List<BookFormatMetadataDto> {
         val formatMetadatas = bookFormatStorageService.listFormatMetadata(bookId)
         logger.debug("getBookFormats (GET /bookFormats/$bookId, result: $formatMetadatas")
-        return formatMetadatas.map { mkBookFormatMetadataDto(it) }
+        return formatMetadatas.map { bookDtoConverter.mkBookFormatMetadataDto(it) }
     }
 
     @GetMapping("bookFormats/{bookId}/{formatId}/contents")
@@ -123,7 +142,4 @@ class BookFormatController {
         if (numDeleted == 0)
             throw BookFormatNotFoundException(bookId)
     }
-
-    private fun mkBookFormatMetadataDto(metadata: BookFormatMetadata) =
-        BookFormatMetadataDto(metadata.bookFormatId, metadata.bookId, metadata.formatType, metadata.size)
 }

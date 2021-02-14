@@ -12,9 +12,9 @@ import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
+import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
-import javax.activation.MimetypesFileTypeMap
 
 @SpringBootApplication
 @EnableConfigurationProperties(FileStorageProperties::class,
@@ -48,7 +48,7 @@ class EbookLibServer {
                         val filename = "test/${idx+1}.jpg"
                         val imagePath = Paths.get(filename)
                         val imageData = Files.readAllBytes(imagePath)
-                        val contentType = MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(filename)
+                        val contentType = Files.probeContentType(File(filename).toPath())
                         val cover = BookCover(bookId, CoverImage(filename, contentType, imageData))
                         bookCoverStorageService.storeCover(cover)
                 }

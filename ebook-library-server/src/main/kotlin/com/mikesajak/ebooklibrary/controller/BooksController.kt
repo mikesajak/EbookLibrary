@@ -1,12 +1,11 @@
 package com.mikesajak.ebooklibrary.controller
 
 import com.mikesajak.ebooklibrary.controller.dto.BookDto
-import com.mikesajak.ebooklibrary.controller.dto.BookFormatMetadataDto
-import com.mikesajak.ebooklibrary.controller.dto.SeriesDto
+import com.mikesajak.ebooklibrary.controller.dto.BookDtoConverter
 import com.mikesajak.ebooklibrary.exceptions.BookAlreadyExistsException
 import com.mikesajak.ebooklibrary.exceptions.BookNotFoundException
 import com.mikesajak.ebooklibrary.exceptions.InvalidRequestException
-import com.mikesajak.ebooklibrary.model.*
+import com.mikesajak.ebooklibrary.model.BookId
 import com.mikesajak.ebooklibrary.storage.BookFormatStorageService
 import com.mikesajak.ebooklibrary.storage.BookMetadataStorageService
 import org.slf4j.LoggerFactory
@@ -22,11 +21,14 @@ class BooksController {
     private val logger = LoggerFactory.getLogger(BooksController::class.java)
 
     @Autowired
-    lateinit var bookMetadataStorageService: BookMetadataStorageService
+    private lateinit var bookMetadataStorageService: BookMetadataStorageService
 
     @Autowired
     @Qualifier("bookFormatAsFileStorageService")
-    lateinit var bookFormatStorageService: BookFormatStorageService
+    private lateinit var bookFormatStorageService: BookFormatStorageService
+
+    @Autowired
+    private lateinit var bookDtoConverter: BookDtoConverter
 
     @PostMapping("/books")
     fun addBook(@RequestBody bookDto: BookDto): String {
@@ -39,11 +41,11 @@ class BooksController {
         }
 
         val booksWithMatchingTitle = bookMetadataStorageService.findBooksWithTitle(bookDto.title, exact=true)
-        if (!booksWithMatchingTitle.isEmpty()) {
+        if (booksWithMatchingTitle.isNotEmpty()) {
             throw BookAlreadyExistsException(booksWithMatchingTitle[0].id.value)
         }
 
-        val book = mkBookMetadata(bookDto)
+        val book = bookDtoConverter.mkBookMetadata(bookDto)
         val bookId = bookMetadataStorageService.addBook(book)
 
         logger.debug("addBook (POST /books) with $bookDto, result: $bookId")
@@ -63,7 +65,7 @@ class BooksController {
             throw BookNotFoundException(bookId)
         }
 
-        val bookToUpdate = Book(bookId, mkBookMetadata(bookDto))
+        val bookToUpdate = bookDtoConverter.mkBook(bookId, bookDto)
         bookMetadataStorageService.updateBook(bookToUpdate)
     }
 
@@ -82,9 +84,7 @@ class BooksController {
         val formats = bookFormatStorageService.listFormatMetadata(bookId)
         logger.debug("Returning book formats for bookId=$bookId: $formats")
 
-        val bookDto = mkBookDto(book, formats)
-
-        return bookDto
+        return bookDtoConverter.mkBookDto(book, formats)
     }
 
     @DeleteMapping("books/{bookId}")
@@ -108,17 +108,15 @@ class BooksController {
     }
 
     @GetMapping("books")
-    fun getBooks(@RequestParam(required = false) query: String?) : List<BookDto> {
+    fun getBooks(@RequestParam(required = false) query: String?): List<BookDto> {
         val books = if (query == null) bookMetadataStorageService.listBooks()
-                    else bookMetadataStorageService.findBooks(query)
+        else bookMetadataStorageService.findBooks(query)
         logger.debug("getBooks (GET /books?query=$query), result: $books")
 
-        val bookDtoList = books.map { book ->
+        return books.map { book ->
             val bookFormats = bookFormatStorageService.listFormatMetadata(book.id)
-            mkBookDto(book, bookFormats)
+            bookDtoConverter.mkBookDto(book, bookFormats)
         }
-
-        return bookDtoList
     }
 
     @GetMapping("bookIds")
@@ -130,20 +128,6 @@ class BooksController {
         return ResponseEntity.ok(bookIds)
     }
 
-    private fun mkBookDto(book: Book, bookFormats: List<BookFormatMetadata>) =
-        book.metadata.let { meta ->
-            BookDto(book.id.value, meta.title, meta.authors, meta.tags,
-                meta.identifiers, meta.creationDate, meta.publicationDate, meta.publisher, meta.languages,
-                meta.series?.let { SeriesDto(it.title, it.number) },
-                meta.description,
-                bookFormats.map { fmt -> BookFormatMetadataDto(fmt.bookFormatId, fmt.bookId, fmt.formatType, fmt.size) }
-            )
-        }
 
-    private fun mkBookMetadata(bookDto: BookDto) =
-        BookMetadata(bookDto.title, bookDto.authors, bookDto.tags, bookDto.identifiers,
-            bookDto.creationDate, bookDto.publicationDate, bookDto.publisher, bookDto.languages,
-            bookDto.series?.let { Series(it.title, it.number) },
-            bookDto.description)
 
 }

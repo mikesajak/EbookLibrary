@@ -1,7 +1,5 @@
 package com.mikesajak.ebooklibrary.controller.dto
 
-import com.mikesajak.ebooklibrary.model.BookFormatId
-import com.mikesajak.ebooklibrary.model.BookId
 import java.time.LocalDate
 
 data class BookDto(val id: String?,
@@ -19,7 +17,7 @@ data class BookDto(val id: String?,
 
 data class SeriesDto(val title: String, val number: Int)
 
-data class BookFormatMetadataDto(val id: BookFormatId,
-                                 val bookId: BookId,
+data class BookFormatMetadataDto(val id: String?,
+                                 val bookId: String,
                                  val formatType: String,
                                  val size: Int)
