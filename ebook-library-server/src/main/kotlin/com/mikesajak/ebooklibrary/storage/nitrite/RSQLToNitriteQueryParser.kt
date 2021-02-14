@@ -14,6 +14,7 @@ class RSQLToNitriteQueryParser {
         val operators = RSQLOperators.defaultOperators()
         operators.add(ComparisonOperator("=rx=", false))
         operators.add(ComparisonOperator("=notrx=", false))
+        operators.add(ComparisonOperator("=like=", false))
         parser = RSQLParser(operators)
     }
 
@@ -22,11 +23,6 @@ class RSQLToNitriteQueryParser {
         return rootNode.accept(NitriteQueryRSQLVisitor())
     }
 }
-//
-//fun main(args: Array<String>) {
-//    val filter = RSQLToNitriteQueryParser().parse("""(title =rx= "Książka" or author =rx= "Dan") and (tag =in= (tag1,tag2) or tag=="tag1") or title =notrx= "dupa"""".trimMargin())
-//    println(filter)
-//}
 
 class NitriteQueryRSQLVisitor : NoArgRSQLVisitorAdapter<ObjectFilter>() {
 
@@ -44,28 +40,39 @@ class NitriteQueryRSQLVisitor : NoArgRSQLVisitorAdapter<ObjectFilter>() {
 
     override fun visit(node: ComparisonNode): ObjectFilter? {
         println("Comparison node: $node")
-        val arrayField = isArrayField(node.selector)
-        val fieldName = if (!arrayField) "metadata.${node.selector}" else "$"
+        val fieldName = correctArrayFieldName(node.selector)
+        val arrayField = isArrayField(fieldName)
+        val dbFieldName = if (!arrayField) "metadata.$fieldName" else "$"
         val filter = when(node.operator.symbol) {
-            "==" -> eq(fieldName, node.arguments[0])
-            "!=" -> not(eq(fieldName, node.arguments[0]))
-            "=in=" -> `in`(fieldName, *node.arguments.toTypedArray())
-            "=out=" -> not(`in`(fieldName, *node.arguments.toTypedArray()))
-            "~=" -> regex(fieldName, node.arguments[0])
-            "=rx=" -> regex(fieldName, node.arguments[0])
-            "=notrx=" -> not(regex(fieldName, node.arguments[0]))
+            "==" -> eq(dbFieldName, node.arguments[0])
+            "!=" -> not(eq(dbFieldName, node.arguments[0]))
+            "=in=" -> `in`(dbFieldName, node.arguments.toTypedArray())
+            "=out=" -> not(`in`(dbFieldName, node.arguments.toTypedArray()))
+            "~=" -> regex(dbFieldName, node.arguments[0])
+            "=like=" -> regex(dbFieldName, ".*?${node.arguments[0]}.*")
+            "=rx=" -> regex(dbFieldName, node.arguments[0])
+            "=notrx=" -> not(regex(dbFieldName, node.arguments[0]))
             else -> throw UnknownOperatorException(node.toString())
         }
-        return if (arrayField) elemMatch("metadata.${node.selector}", filter)
+        return if (arrayField) elemMatch("metadata.${fieldName}", filter)
                else filter
     }
 
-    fun isArrayField(name: String) = when(name) {
-        "tags" -> true
+    private fun isArrayField(name: String) = when(name) {
         "authors" -> true
+        "tags" -> true
         "languages" -> true
         else -> false
     }
+
+    private fun correctArrayFieldName(name: String) = when(name) {
+        "author" -> "authors"
+        "tag" -> "tags"
+        "language" -> "languages"
+        "lang" -> "languages"
+        else -> name
+    }
+
 
 
 
