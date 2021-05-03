@@ -5,6 +5,7 @@ import cz.jirutka.rsql.parser.ast.*
 import org.dizitart.no2.objects.ObjectFilter
 import org.dizitart.no2.objects.filters.ObjectFilters.*
 import org.springframework.stereotype.Component
+import java.util.regex.Pattern
 
 @Component
 class RSQLToNitriteQueryParser {
@@ -49,7 +50,7 @@ class NitriteQueryRSQLVisitor : NoArgRSQLVisitorAdapter<ObjectFilter>() {
             "=in=" -> `in`(dbFieldName, node.arguments.toTypedArray())
             "=out=" -> not(`in`(dbFieldName, node.arguments.toTypedArray()))
             "~=" -> regex(dbFieldName, node.arguments[0])
-            "=like=" -> regex(dbFieldName, ".*?${node.arguments[0]}.*")
+            "=like=" -> regex(dbFieldName, prepareLikeRegexMatcher(node.arguments[0]))
             "=rx=" -> regex(dbFieldName, node.arguments[0])
             "=notrx=" -> not(regex(dbFieldName, node.arguments[0]))
             else -> throw UnknownOperatorException(node.toString())
@@ -57,6 +58,8 @@ class NitriteQueryRSQLVisitor : NoArgRSQLVisitorAdapter<ObjectFilter>() {
         return if (arrayField) elemMatch("metadata.${fieldName}", filter)
                else filter
     }
+
+    private fun prepareLikeRegexMatcher(query: String) = "(?i).*?${Pattern.quote(query)}.*"
 
     private fun isArrayField(name: String) = when(name) {
         "authors" -> true
