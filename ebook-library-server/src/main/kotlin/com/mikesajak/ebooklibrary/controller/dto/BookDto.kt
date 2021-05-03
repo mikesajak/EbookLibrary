@@ -1,7 +1,9 @@
 package com.mikesajak.ebooklibrary.controller.dto
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import java.time.LocalDate
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class BookDto(val id: String?,
                    val title: String,
                    val authors: List<String>,

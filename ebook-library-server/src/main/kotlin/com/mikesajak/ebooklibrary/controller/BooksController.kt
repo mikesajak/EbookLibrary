@@ -1,19 +1,16 @@
 package com.mikesajak.ebooklibrary.controller
 
 import com.mikesajak.ebooklibrary.controller.dto.BookDto
-import com.mikesajak.ebooklibrary.controller.dto.BookDtoConverter
-import com.mikesajak.ebooklibrary.exceptions.BookAlreadyExistsException
-import com.mikesajak.ebooklibrary.exceptions.BookNotFoundException
-import com.mikesajak.ebooklibrary.exceptions.InvalidRequestException
+import com.mikesajak.ebooklibrary.controller.dto.BookFormatMetadataDto
 import com.mikesajak.ebooklibrary.model.BookId
-import com.mikesajak.ebooklibrary.storage.BookFormatStorageService
-import com.mikesajak.ebooklibrary.storage.BookMetadataStorageService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 
 @Suppress("unused")
 @RestController
@@ -21,113 +18,96 @@ class BooksController {
     private val logger = LoggerFactory.getLogger(BooksController::class.java)
 
     @Autowired
-    private lateinit var bookMetadataStorageService: BookMetadataStorageService
+    private lateinit var booksService: BooksService
 
     @Autowired
-    @Qualifier("bookFormatAsFileStorageService")
-    private lateinit var bookFormatStorageService: BookFormatStorageService
+    private lateinit var bookFormatsService: BookFormatsService
 
     @Autowired
-    private lateinit var bookDtoConverter: BookDtoConverter
+    private lateinit var bookImageService: BookImageService
 
     @PostMapping("/books")
     fun addBook(@RequestBody bookDto: BookDto): String {
-
-        if (bookDto.id != null) {
-            val book = bookMetadataStorageService.getBook(BookId(bookDto.id))
-            if (book != null) {
-                throw BookAlreadyExistsException(bookDto.id)
-            }
-        }
-
-        val booksWithMatchingTitle = bookMetadataStorageService.findBooksWithTitle(bookDto.title, exact=true)
-        if (booksWithMatchingTitle.isNotEmpty()) {
-            throw BookAlreadyExistsException(booksWithMatchingTitle[0].id.value)
-        }
-
-        val book = bookDtoConverter.mkBookMetadata(bookDto)
-        val bookId = bookMetadataStorageService.addBook(book)
-
-        logger.debug("addBook (POST /books) with $bookDto, result: $bookId")
-        return bookId.value
+        logger.info("addBook (POST /books) with $bookDto")
+        return booksService.addBook(bookDto).value
     }
 
     @PutMapping("/books/{bookId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun updateBook(@PathVariable bookId: String, @RequestBody bookDto: BookDto) = updateBook(BookId(bookId), bookDto)
-
-    private fun updateBook(bookId: BookId, bookDto: BookDto) {
-        logger.debug("updateBook (PUT /books/$bookId) with $bookDto")
-        if (bookId.value != bookDto.id) {
-            throw InvalidRequestException("The bookId=$bookId is inconsistent with the book id provided in book data (id=${bookDto.id})")
-        }
-        if (bookMetadataStorageService.getBook(bookId) == null) {
-            throw BookNotFoundException(bookId)
-        }
-
-        val bookToUpdate = bookDtoConverter.mkBook(bookId, bookDto)
-        bookMetadataStorageService.updateBook(bookToUpdate)
+    fun updateBook(@PathVariable bookId: String, @RequestBody bookDto: BookDto) {
+        logger.info("updateBook (PUT /books/$bookId) with $bookDto")
+        booksService.updateBook(BookId(bookId), bookDto)
     }
 
-    @GetMapping("books/{bookId}")
-    fun getBook(@PathVariable bookId: String): BookDto = getBook(BookId(bookId))
-
-    private fun getBook(bookId: BookId): BookDto {
-        val book = bookMetadataStorageService.getBook(bookId)
-
-        logger.debug("getBook (GET /books/$bookId), result: $book")
-
-        if (book == null) {
-            throw BookNotFoundException(bookId)
-        }
-
-        val formats = bookFormatStorageService.listFormatMetadata(bookId)
-        logger.debug("Returning book formats for bookId=$bookId: $formats")
-
-        return bookDtoConverter.mkBookDto(book, formats)
+    @GetMapping("/books/{bookId}")
+    fun getBook(@PathVariable bookId: String): BookDto {
+        logger.info("getBook (GET /books/$bookId)")
+        return booksService.getBook(BookId(bookId))
     }
 
-    @DeleteMapping("books/{bookId}")
+    @DeleteMapping("/books/{bookId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun deleteBook(@PathVariable bookId: String) = deleteBook(BookId(bookId))
-
-    private fun deleteBook(bookId: BookId) {
-        val book = bookMetadataStorageService.getBook(bookId)
-
-        logger.debug("deleteBook (DELETE /books/$bookId), result: $book")
-
-        if (book == null) {
-            throw BookNotFoundException(bookId)
-        }
-
-        val numFormatsRemoved = bookFormatStorageService.removeFormats(bookId)
-        logger.debug("Remove all book formats for bookId=$bookId. Num removed=$numFormatsRemoved")
-
-        val numRemoved = bookMetadataStorageService.removeBook(bookId)
-        logger.debug("Remove book with bookId: $bookId. Num removed=$numRemoved")
+    fun deleteBook(@PathVariable bookId: String) {
+        logger.info("deleteBook (DELETE /books/$bookId)")
+        booksService.deleteBook(BookId(bookId))
     }
 
-    @GetMapping("books")
+    @GetMapping("/books")
     fun getBooks(@RequestParam(required = false) query: String?): List<BookDto> {
-        val books = if (query == null) bookMetadataStorageService.listBooks()
-        else bookMetadataStorageService.findBooks(query)
-        logger.debug("getBooks (GET /books?query=$query), result: $books")
-
-        return books.map { book ->
-            val bookFormats = bookFormatStorageService.listFormatMetadata(book.id)
-            bookDtoConverter.mkBookDto(book, bookFormats)
-        }
+        logger.info("getBooks (GET /books?query=$query)")
+        return booksService.getBooks(query)
     }
 
-    @GetMapping("bookIds")
+    @GetMapping("/bookIds")
     fun getBookIds(@RequestParam(required = false) query: String?) : ResponseEntity<List<BookId>> {
-        val books = if (query == null) bookMetadataStorageService.listBooks()
-                    else bookMetadataStorageService.findBooks(query)
-        val bookIds = books.map { it.id }
-        logger.debug("getBookIds (GET /books?query=$query), result: $books")
+        logger.info("getBookIds (GET /booksIds?query=$query)")
+        val bookIds = booksService.getBookIds(query)
         return ResponseEntity.ok(bookIds)
     }
 
+    // book formats
 
+    @GetMapping("/books/{bookId}/formats")
+    fun getBookFormats(@PathVariable bookId: BookId): List<BookFormatMetadataDto> {
+        logger.info("getBookFormats (GET / books/{$bookId}/formats")
+        return bookFormatsService.getBookFormats(bookId)
+    }
 
+    @PostMapping("/books/{bookId}/formats")
+    fun uploadBookFormat(@PathVariable("bookId") bookId: BookId,
+//                         @RequestParam("formatMetadata") bookFormatMetadataDto: BookFormatMetadataDto?,
+                         @RequestParam("formatType") formatType: String?,
+                         @RequestParam("file") file: MultipartFile): String {
+        logger.info("uploadBookFormat (POST /books/$bookId/formats)")
+        return bookFormatsService.uploadBookFormat(bookId, formatType, file)
+    }
+
+    // cover images
+
+    @GetMapping("/books/{bookId}/cover")
+    fun getBookCover(@PathVariable("bookId") bookId: BookId): ResponseEntity<ByteArray> {
+        logger.info("getBookCover (GET /books/$bookId/cover)")
+        val cover = bookImageService.getCoverImage(bookId)
+
+        return if (cover != null)
+            ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(cover.coverImage.contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"${cover.coverImage.name}\"")
+//                .cacheControl(CacheControl.noCache())
+                .body(cover.coverImage.imageData)
+        else ResponseEntity.notFound().build()
+    }
+
+    @PostMapping("/books/{bookId}/cover")
+    fun uploadCoverImage(@PathVariable("bookId") bookId: BookId,
+                         @RequestParam("file") file: MultipartFile) {
+        logger.info("uploadCoverImage (GET /books/$bookId/cover")
+        bookImageService.setCoverImage(bookId, file)
+    }
+
+    @DeleteMapping("/books/{bookId}/cover")
+    fun deleteCoverImage(@PathVariable bookId: BookId) {
+        logger.info("deleteCoverImage (DELETE /books/$bookId/cover")
+        bookImageService.deleteCoverImage(bookId)
+    }
 }

@@ -6,5 +6,9 @@ import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ResponseStatus
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
-class BookFormatNotFoundException(bookId: BookId, bookFormatId: BookFormatId? = null)
-    : RuntimeException("Requested book format not found for bookId=$bookId, bookFormatId=$bookFormatId")
+class BookFormatNotFoundException(bookFormatId: BookFormatId? = null)
+    : RuntimeException("Requested book format not found for bookFormatId=$bookFormatId")
+
+@ResponseStatus(HttpStatus.NOT_FOUND)
+class BookFormatsNotFoundException(bookId: BookId? = null)
+    : RuntimeException("Requested book format not found for bookId=$bookId")
