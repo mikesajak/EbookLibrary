@@ -15,22 +15,22 @@ import org.springframework.web.bind.annotation.RestController
 
 @Suppress("unused")
 @RestController
-class BookFormatsController2 {
-    private val logger = LoggerFactory.getLogger(BookFormatsController2::class.java)
+class BookFormatsController {
+    private val logger = LoggerFactory.getLogger(BookFormatsController::class.java)
 
     @Autowired
     private lateinit var bookFormatsService: BookFormatsService
 
-    @GetMapping("/bookFormats2/{formatId}")
+    @GetMapping("/bookFormats/{formatId}")
     fun getBookFormatMetadata(@PathVariable("formatId") formatId: BookFormatId): BookFormatMetadataDto {
-        logger.info("getBookFormatContents2 (GET /bookFormats2/$formatId")
+        logger.info("getBookFormatMetadata (GET /bookFormats/$formatId")
         val bookFormat = bookFormatsService.getBookFormatMetadata(formatId)
         return bookFormat
     }
 
-    @GetMapping("/bookFormats2/{formatId}/contents")
+    @GetMapping("/bookFormats/{formatId}/contents")
     fun getBookFormatContents(@PathVariable("formatId") formatId: BookFormatId): ResponseEntity<ByteArray> {
-        logger.info("getBookFormatContents2 (GET /bookFormats2/$formatId")
+        logger.info("getBookFormatContents (GET /bookFormats/$formatId")
         val bookFormat = bookFormatsService.getBookFormat(formatId)
         return ResponseEntity.ok()
             .contentType(MediaType.parseMediaType(bookFormat.metadata.formatType))
@@ -39,9 +39,9 @@ class BookFormatsController2 {
             .body(bookFormat.contents)
     }
 
-    @DeleteMapping("/bookFormats2/{bookFormatId}")
+    @DeleteMapping("/bookFormats/{bookFormatId}")
     fun deleteBookFormat(@PathVariable("bookFormatId") bookFormatId: BookFormatId) {
-        logger.info("deleteBookFormat (DELETE /bookFormats2/$bookFormatId")
+        logger.info("deleteBookFormat (DELETE /bookFormats/$bookFormatId")
         bookFormatsService.deleteBookFormat(bookFormatId)
     }
 

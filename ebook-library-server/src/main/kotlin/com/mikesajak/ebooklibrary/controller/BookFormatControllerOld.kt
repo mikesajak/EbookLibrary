@@ -17,13 +17,14 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes
 
 @Suppress("unused")
 @RestController
-class BookFormatController {
-    private val logger = LoggerFactory.getLogger(BookFormatController::class.java)
+@Deprecated("To be removed")
+class BookFormatControllerOld {
+    private val logger = LoggerFactory.getLogger(BookFormatControllerOld::class.java)
 
     @Autowired
     private lateinit var bookFormatsService: BookFormatsService
 
-    @PostMapping("/bookFormats")
+    @PostMapping("/bookFormatsOld")
     fun uploadTestFormat(@RequestParam("file") file: MultipartFile,
                          redirectAttributes: RedirectAttributes): String {
         val contentType = file.contentType ?: throw BookFormatTypeException("No content type for book format provided. ${file.name}")
@@ -35,25 +36,25 @@ class BookFormatController {
 
     private var dryRun = false
 
-    @PostMapping("/bookFormats/{bookId}")
+    @PostMapping("/bookFormatsOld/{bookId}")
     fun uploadBookFormat(@PathVariable("bookId") bookId: BookId,
 //                         @RequestParam("formatMetadata") bookFormatMetadataDto: BookFormatMetadataDto?,
                          @RequestParam("formatType") formatType: String?,
                          @RequestParam("file") file: MultipartFile): String {
-        logger.info("uploadBookFormat (POST/bookFormats/$bookId)")
+        logger.info("uploadBookFormat (POST/bookFormatsOld/$bookId)")
         return bookFormatsService.uploadBookFormat(bookId, formatType, file)
     }
 
-    @GetMapping("/bookFormats/{bookId}")
+    @GetMapping("/bookFormatsOld/{bookId}")
     fun getBookFormats(@PathVariable bookId: BookId): List<BookFormatMetadataDto> {
-        logger.info("getBookFormats (GET /bookFormats/$bookId)")
+        logger.info("getBookFormats (GET /bookFormatsOld/$bookId)")
         return bookFormatsService.getBookFormats(bookId)
     }
 
-    @GetMapping("/bookFormats/{bookId}/{formatId}/contents")
+    @GetMapping("/bookFormatsOld/{bookId}/{formatId}/contents")
     fun getBookFormatContents(@PathVariable("bookId") bookId: BookId,
                               @PathVariable("formatId") formatId: BookFormatId): ResponseEntity<ByteArray>? {
-        logger.info("getBookFormatContents (GET /bookFormats/$bookId/$formatId/contents")
+        logger.info("getBookFormatContents (GET /bookFormatsOld/$bookId/$formatId/contents")
 
         val bookFormat = bookFormatsService.getBookFormat(formatId)
         return ResponseEntity.ok()
@@ -63,16 +64,16 @@ class BookFormatController {
             .body(bookFormat.contents)
     }
 
-    @DeleteMapping("/bookFormats/{bookId}/{bookFormatId}")
+    @DeleteMapping("/bookFormatsOld/{bookId}/{bookFormatId}")
     fun deleteBookFormat(@PathVariable("bookId") bookId: BookId,
                          @PathVariable("bookFormatId") bookFormatId: BookFormatId) {
-        logger.info("deleteBookFormat (DELETE /bookFormats/$bookId/$bookFormatId")
+        logger.info("deleteBookFormat (DELETE /bookFormatsOld/$bookId/$bookFormatId")
         bookFormatsService.deleteBookFormat(bookFormatId)
     }
 
-    @DeleteMapping("/bookFormats/{bookId}")
+    @DeleteMapping("/bookFormatsOld/{bookId}")
     fun deleteAllBookFormats(@PathVariable("bookId") bookId: BookId) {
-        logger.info("deleteAllBookFormats (DELETE /bookFormats/$bookId)")
+        logger.info("deleteAllBookFormats (DELETE /bookFormatsOld/$bookId)")
         bookFormatsService.deleteAllBookFormats(bookId)
     }
 }
